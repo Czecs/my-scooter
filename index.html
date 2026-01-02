@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2641/2641271.png">
+    
+    <title>ScooterMaster V24 Ultimate</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        tailwind.config = { theme: { extend: { colors: { slate: { 850: '#151f32', 900: '#0f172a' }, accent: '#10b981', danger: '#ef4444', warning: '#f59e0b', info: '#3b82f6' }, fontFamily: { mono: ['ui-monospace', 'monospace'] } } } }
+    </script>
+
+    <style>
+        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+        .glass-panel { background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
+        .digital-clock { text-shadow: 0 0 15px rgba(16, 185, 129, 0.4); letter-spacing: -1px; }
+        .dashboard-value { text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+        #map { height: 100%; width: 100%; border-radius: 0; z-index: 1; }
+        
+        /* SPECIFIC STYLES */
+        .wake-active { color: #fbbf24; text-shadow: 0 0 10px #fbbf24; }
+        .nav-arrow { width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 20px solid #10b981; filter: drop-shadow(0 0 5px rgba(0,0,0,0.5)); transition: transform 0.3s ease; }
+        .nav-arrow-container { display: flex; justify-content: center; align-items: center; width: 40px; height: 40px; background: rgba(15, 23, 42, 0.5); border-radius: 50%; border: 2px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+        
+        /* PIN CODE */
+        #login-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.98); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(10px); transition: opacity 0.5s; }
+        .pin-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid #334155; transition: all 0.2s; }
+        .pin-dot.filled { background: #10b981; border-color: #10b981; box-shadow: 0 0 10px #10b981; }
+        .numpad-btn { width: 60px; height: 60px; border-radius: 50%; border: 1px solid #334155; color: white; font-size: 24px; display: flex; items-center; justify-content: center; transition: all 0.1s; background: rgba(30, 41, 59, 0.5); }
+        .numpad-btn:active { background: #10b981; color: #0f172a; border-color: #10b981; transform: scale(0.95); }
+
+        /* HUD & TABS */
+        .tab-content { display: none; flex-direction: column; height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 6rem; }
+        .tab-content.active { display: flex; }
+        .nav-btn.active { color: #10b981; background: rgba(16, 185, 129, 0.1); border-color: #10b981; }
+        .hud-overlay { position: absolute; z-index: 500; text-shadow: 0 2px 4px rgba(0,0,0,0.8); pointer-events: none; }
+        .hud-top-left { top: 1rem; left: 1rem; }
+        .hud-top-right { top: 1rem; right: 1rem; text-align: right; }
+        .hud-bottom-center { bottom: 6rem; left: 50%; transform: translateX(-50%); width: 90%; pointer-events: auto; }
+    </style>
+</head>
+<body onclick="requestWakeLock()"> 
+
+    <div id="login-overlay">
+        <div class="mb-8 flex flex-col items-center">
+            <i class="fa-solid fa-crown text-4xl text-accent mb-4"></i>
+            <h2 class="text-white font-bold text-xl uppercase tracking-widest">Ultimate V24</h2>
+            <p class="text-slate-500 text-xs mt-1">Code PIN requis</p>
+        </div>
+        <div class="flex gap-4 mb-8"><div class="pin-dot" id="dot-1"></div><div class="pin-dot" id="dot-2"></div><div class="pin-dot" id="dot-3"></div><div class="pin-dot" id="dot-4"></div></div>
+        <div class="grid grid-cols-3 gap-6">
+            <button class="numpad-btn" onclick="typePin(1)">1</button><button class="numpad-btn" onclick="typePin(2)">2</button><button class="numpad-btn" onclick="typePin(3)">3</button>
+            <button class="numpad-btn" onclick="typePin(4)">4</button><button class="numpad-btn" onclick="typePin(5)">5</button><button class="numpad-btn" onclick="typePin(6)">6</button>
+            <button class="numpad-btn" onclick="typePin(7)">7</button><button class="numpad-btn" onclick="typePin(8)">8</button><button class="numpad-btn" onclick="typePin(9)">9</button>
+            <div class="w-[60px]"></div><button class="numpad-btn" onclick="typePin(0)">0</button><button class="numpad-btn text-red-400 border-red-900/50" onclick="clearPin()"><i class="fa-solid fa-delete-left"></i></button>
+        </div>
+    </div>
+
+    <nav class="glass-panel sticky top-0 z-50 border-b border-slate-700/50 pt-safe-top h-16 flex-none flex justify-between items-center px-4">
+        <div class="flex items-center gap-2 text-slate-500 z-10"><i class="fa-solid fa-cloud-bolt text-accent text-xs"></i> <span class="text-[10px] font-bold uppercase">Ultimate V24</span></div>
+        <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl font-black text-white digital-clock font-mono" id="clock-display">--:--</div>
+        <div class="flex items-center gap-3 z-10"><i id="wake-icon" class="fa-solid fa-lightbulb text-slate-600 text-sm transition-colors duration-500"></i></div>
+    </nav>
+
+    <main class="flex-grow relative w-full max-w-7xl mx-auto overflow-hidden">
+        
+        <div id="tab-dashboard" class="tab-content active p-3 gap-3">
+            
+            <div class="grid grid-cols-2 gap-2 flex-none">
+                <div class="glass-panel rounded-xl p-2 flex flex-col items-center justify-center bg-blue-900/20 border border-blue-500/30">
+                    <span class="text-blue-400 text-[9px] font-bold uppercase mb-1"><i class="fa-solid fa-cloud-rain mr-1"></i>Météo</span>
+                    <div id="weather-content" class="text-center">
+                        <span class="text-xs text-slate-400">GPS requis</span>
+                    </div>
+                </div>
+                <div class="glass-panel rounded-xl p-2 flex flex-col items-center justify-center bg-emerald-900/20 border border-emerald-500/30">
+                    <span class="text-emerald-400 text-[9px] font-bold uppercase mb-1"><i class="fa-solid fa-piggy-bank mr-1"></i>Économies</span>
+                    <div class="text-white font-bold font-mono"><span id="savings-display">0</span> <span class="text-xs">€</span></div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 flex-none">
+                <div class="glass-panel rounded-xl p-2 flex flex-col items-center justify-center bg-slate-800/60 border-l-2 border-l-accent"><span class="text-slate-500 text-[9px] font-bold uppercase">Vitesse</span><div class="flex items-baseline"><span id="dash-speed" class="text-3xl font-bold text-white dashboard-value font-mono leading-none">0</span><span class="text-[10px] text-accent ml-1">km/h</span></div></div>
+                <div class="glass-panel rounded-xl p-2 flex flex-col items-center justify-center bg-slate-800/60 border-r-2 border-r-accent"><span class="text-slate-500 text-[9px] font-bold uppercase">Session</span><div class="flex items-baseline"><span id="dash-dist" class="text-3xl font-bold text-white dashboard-value font-mono leading-none">0.0</span><span class="text-[10px] text-accent ml-1">km</span></div></div>
+            </div>
+
+            <div class="glass-panel rounded-xl p-3 border border-slate-600 flex-none">
+                <h3 class="text-slate-400 text-[10px] uppercase font-bold mb-2 flex justify-between">Navigation Rapide <i class="fa-brands fa-waze text-blue-400"></i></h3>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="openNav('home')" class="bg-slate-700 hover:bg-slate-600 text-white py-2 rounded flex items-center justify-center gap-2 transition active:scale-95"><i class="fa-solid fa-house text-accent text-xs"></i> <span class="text-xs font-bold">Maison</span></button>
+                    <button onclick="openNav('work')" class="bg-slate-700 hover:bg-slate-600 text-white py-2 rounded flex items-center justify-center gap-2 transition active:scale-95"><i class="fa-solid fa-briefcase text-warning text-xs"></i> <span class="text-xs font-bold">Travail</span></button>
+                </div>
+            </div>
+            
+            <div class="glass-panel rounded-xl p-4 border-t border-slate-600 shadow-lg flex-none">
+                <div class="flex gap-2 mb-3 h-14">
+                    <div class="w-1/3 flex flex-col justify-center items-center bg-slate-950/40 rounded-lg border border-slate-700 relative px-1">
+                        <div class="flex justify-between items-center w-full px-1 mb-1"><span class="text-[10px] font-bold text-slate-400">GPS</span><span id="gps-status" class="text-[8px] text-slate-500">OFF</span></div>
+                        <label class="relative inline-flex items-center cursor-pointer scale-90"><input type="checkbox" id="gps-toggle" class="sr-only peer" onchange="toggleGPSMode()"><div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:bg-accent after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div></label>
+                    </div>
+                    <button id="btn-timer" onclick="toggleTimer()" class="flex-grow flex items-center justify-center gap-3 rounded-lg font-black text-lg transition-all bg-accent text-slate-900 hover:bg-white shadow-md active:scale-95"><i class="fa-solid fa-play"></i> <span id="timer-display">00:00:00</span></button>
+                </div>
+                <div class="space-y-2 bg-slate-800/40 p-3 rounded-lg border border-white/5">
+                    <input type="text" id="input-title" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-white focus:border-accent outline-none text-sm" placeholder="Nom du trajet (ex: Balade)">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="relative"><input type="number" id="input-dist" step="0.1" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-white font-mono font-bold focus:border-accent outline-none text-base" placeholder="0.0"><span class="absolute right-3 top-2.5 text-xs text-slate-500 font-bold">km</span></div>
+                        <input type="date" id="input-date" class="w-full bg-slate-900 border border-slate-700 rounded px-1 py-2 text-xs text-slate-300 outline-none text-center">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 mt-2">
+                        <button onclick="addLog()" class="bg-slate-700 hover:bg-emerald-600 text-white py-3 rounded-lg font-bold transition active:scale-95 shadow-lg text-xs uppercase tracking-wide"><i class="fa-solid fa-floppy-disk mr-2"></i> Save</button>
+                        <button onclick="exportCurrentGPX()" id="btn-gpx" disabled class="bg-slate-800 border border-slate-600 text-slate-400 py-3 rounded-lg font-bold transition active:scale-95 shadow-lg text-xs uppercase tracking-wide disabled:opacity-50"><i class="fa-solid fa-route mr-2"></i> GPX</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-xl p-3 flex-col min-h-[200px] mb-6">
+                <h3 class="text-slate-300 font-bold text-xs uppercase mb-2"><i class="fa-solid fa-list mr-1 text-accent"></i>Historique</h3>
+                <table class="w-full text-left text-xs text-slate-400"><tbody id="logs-table-body" class="divide-y divide-slate-700/30"></tbody></table>
+                <div id="empty-state" class="hidden text-center py-4 text-slate-600 text-[10px] italic">Aucun trajet</div>
+            </div>
+        </div>
+
+        <div id="tab-map" class="tab-content h-full relative p-0 overflow-hidden">
+            <div id="map" class="w-full h-full"></div>
+            <div class="hud-overlay hud-top-left">
+                <div class="text-[10px] text-accent uppercase font-bold">Vitesse</div>
+                <div class="text-6xl font-black font-mono text-white leading-none tracking-tighter" id="hud-speed">0</div>
+                <div class="text-xs text-slate-300 font-bold mt-1">km/h</div>
+            </div>
+            <div class="hud-overlay hud-top-right">
+                <div class="text-[10px] text-slate-400 uppercase font-bold">Altitude</div>
+                <div class="text-2xl font-bold font-mono text-white"><span id="hud-alt">0</span><span class="text-xs text-slate-400 ml-1">m</span></div>
+                <div class="text-[10px] text-slate-400 uppercase font-bold mt-2">Distance</div>
+                <div class="text-2xl font-bold font-mono text-accent"><span id="hud-dist">0.0</span><span class="text-xs text-slate-400 ml-1">km</span></div>
+            </div>
+            <div class="hud-overlay hud-bottom-center glass-panel p-3 rounded-xl flex justify-between items-center bg-slate-900/90 border border-slate-600">
+                <div class="flex items-center gap-2">
+                    <div id="rec-dot" class="w-3 h-3 rounded-full bg-slate-600"></div>
+                    <div class="text-white font-mono font-bold" id="hud-timer">00:00:00</div>
+                </div>
+                <button onclick="centerMap(true)" class="bg-accent text-slate-900 w-10 h-10 rounded-full shadow-lg active:scale-90 flex items-center justify-center font-bold"><i class="fa-solid fa-location-arrow"></i></button>
+            </div>
+        </div>
+
+        <div id="tab-garage" class="tab-content h-full p-3 flex-col gap-3">
+            <div class="glass-panel rounded-xl p-4 bg-slate-900/60 border border-slate-600 text-center flex-none">
+                <span class="text-[10px] text-slate-400 uppercase font-bold mb-1">Odomètre Total</span>
+                <div class="flex items-center justify-center gap-2 mt-2"><input type="number" id="odo-input" step="0.1" onchange="manualUpdateODO(this.value)" class="bg-transparent text-4xl font-mono font-black text-white w-40 text-center focus:outline-none border-b border-transparent focus:border-accent p-0 leading-none" placeholder="0.0"><span class="text-sm text-slate-500 font-bold">km</span></div>
+            </div>
+
+            <div class="glass-panel rounded-xl p-4 border border-slate-600 flex-none">
+                <h3 class="text-slate-400 text-xs uppercase font-bold mb-3"><i class="fa-solid fa-map-pin mr-2"></i>Adresses Rapides</h3>
+                <div class="flex flex-col gap-2">
+                    <input type="text" id="addr-home" onchange="saveAddresses()" class="bg-slate-900 border border-slate-700 rounded px-2 py-2 text-white text-xs w-full" placeholder="Adresse Maison (ex: 12 Rue de la Paix, Paris)">
+                    <input type="text" id="addr-work" onchange="saveAddresses()" class="bg-slate-900 border border-slate-700 rounded px-2 py-2 text-white text-xs w-full" placeholder="Adresse Travail">
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-xl p-4 border border-slate-600 flex-none">
+                <h3 class="text-emerald-400 text-xs uppercase font-bold mb-3"><i class="fa-solid fa-money-bill-wave mr-2"></i>Calculateur Économies</h3>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                        <label class="text-slate-500 block mb-1">Coût Voiture (€/km)</label>
+                        <input type="number" id="cost-car" step="0.01" onchange="saveEcoSettings()" class="bg-slate-900 border border-slate-700 rounded px-2 py-2 text-white w-full" placeholder="0.20">
+                    </div>
+                    <div>
+                        <label class="text-slate-500 block mb-1">Coût Scooter (€/km)</label>
+                        <input type="number" id="cost-scooter" step="0.01" onchange="saveEcoSettings()" class="bg-slate-900 border border-slate-700 rounded px-2 py-2 text-white w-full" placeholder="0.05">
+                    </div>
+                </div>
+                <p class="text-[9px] text-slate-500 mt-2 italic">Basé sur le kilométrage total.</p>
+            </div>
+            
+            <div class="glass-panel rounded-xl p-4 border border-slate-600 relative overflow-hidden flex-none">
+                <div class="flex justify-between items-start mb-4"><h3 class="text-white font-bold"><i class="fa-solid fa-wrench text-warning mr-2"></i>Entretien</h3><button onclick="resetMaintenance()" class="text-[10px] bg-slate-700 px-2 py-1 rounded text-white hover:bg-accent">Fait !</button></div>
+                <div class="relative pt-1 mb-4">
+                    <div class="flex justify-between text-xs text-slate-400 mb-1"><span>Fait à: <span id="maint-last">0</span></span><span>Prochain: <span id="maint-next">0</span></span></div>
+                    <div class="overflow-hidden h-3 mb-2 text-xs flex rounded-full bg-slate-700 border border-slate-600"><div id="maint-bar" style="width: 0%" class="bg-accent transition-all duration-500"></div></div>
+                    <div class="flex justify-between items-center"><span class="text-[10px] text-slate-400" id="maint-remaining-text">Reste: 0 km</span><div id="maint-alert" class="hidden text-red-400 text-xs font-bold animate-pulse"><i class="fa-solid fa-triangle-exclamation"></i></div></div>
+                </div>
+                <div class="pt-4 border-t border-slate-700 flex gap-2"><input type="number" id="maint-interval-input" class="bg-slate-900 border border-slate-700 rounded text-white px-2 py-2 text-sm w-full font-mono" placeholder="Intervalle"><button onclick="saveMaintSettings()" class="bg-slate-700 text-white px-3 rounded"><i class="fa-solid fa-check"></i></button></div>
+            </div>
+
+            <div class="glass-panel rounded-xl p-4 border border-slate-600 flex-none">
+                <h3 class="text-slate-400 text-xs uppercase font-bold mb-3"><i class="fa-solid fa-lock mr-2"></i>Sécurité</h3>
+                <div class="flex gap-2"><input type="number" id="new-pin-input" class="bg-slate-900 border border-slate-700 rounded px-3 py-2 text-white text-sm w-full outline-none" placeholder="Nouveau code"><button onclick="changeUserPin()" class="bg-slate-700 hover:bg-accent text-white px-4 py-2 rounded text-xs font-bold transition">OK</button></div>
+            </div>
+
+            <div class="glass-panel rounded-xl p-4 border border-slate-600 flex-none mb-6">
+                <h3 class="text-slate-400 text-xs uppercase font-bold mb-3">Sauvegarde</h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="exportJSON()" class="col-span-2 bg-slate-800 hover:bg-slate-700 text-slate-200 py-3 rounded text-xs border border-slate-600 font-bold"><i class="fa-solid fa-download mr-2"></i> Sauver (JSON)</button>
+                    <button onclick="document.getElementById('fileInput').click()" class="col-span-2 bg-slate-800 hover:bg-slate-700 text-slate-200 py-3 rounded text-xs border border-slate-600"><i class="fa-solid fa-upload mr-2"></i> Restaurer</button>
+                    <input type="file" id="fileInput" class="hidden" onchange="importJSON(this)">
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <nav class="fixed bottom-0 left-0 right-0 glass-panel border-t border-slate-700/50 h-16 z-50">
+        <div class="grid grid-cols-3 h-full max-w-7xl mx-auto">
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn active flex flex-col items-center justify-center text-slate-400 hover:text-white border-t-2 border-transparent transition-all"><i class="fa-solid fa-gauge-high text-lg mb-1"></i><span class="text-[10px] font-bold uppercase">Dash</span></button>
+            <button onclick="switchTab('map')" id="nav-map" class="nav-btn flex flex-col items-center justify-center text-slate-400 hover:text-white border-t-2 border-transparent transition-all"><i class="fa-solid fa-location-arrow text-lg mb-1"></i><span class="text-[10px] font-bold uppercase">Cockpit</span></button>
+            <button onclick="switchTab('garage')" id="nav-garage" class="nav-btn flex flex-col items-center justify-center text-slate-400 hover:text-white border-t-2 border-transparent transition-all"><i class="fa-solid fa-wrench text-lg mb-1"></i><span class="text-[10px] font-bold uppercase">Garage</span></button>
+        </div>
+    </nav>
+
+    <script>
+        // --- 1. CORE & PIN ---
+        setInterval(() => { const el = document.getElementById('clock-display'); if(el) el.innerText = new Date().toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'}); }, 1000);
+        let savedPin = localStorage.getItem('scooter_pin') || "0000"; let currentPin = "";
+        function typePin(d) { if(currentPin.length<4){ currentPin+=d; updatePinDots(); if(currentPin.length===4) checkPin(); } }
+        function clearPin() { currentPin=""; updatePinDots(); document.getElementById('login-error').classList.add('opacity-0'); }
+        function updatePinDots() { for(let i=1;i<=4;i++) document.getElementById('dot-'+i).classList.toggle('filled', i<=currentPin.length); }
+        function checkPin() { if(currentPin===savedPin) document.getElementById('login-overlay').style.display='none'; else { document.getElementById('login-error').classList.remove('opacity-0'); setTimeout(clearPin,500); } }
+        function changeUserPin() { const n = document.getElementById('new-pin-input').value; if(n.length===4 && confirm('Changer PIN?')) { localStorage.setItem('scooter_pin', n); savedPin=n; alert('OK'); document.getElementById('new-pin-input').value=""; } }
+        
+        // --- 2. DATA ---
+        let state = { odo: 0, maintenanceKm: 0, maintInterval: 500, logs: [], addresses: {home:'', work:''}, eco: {car: 0.20, scooter: 0.05} };
+        function loadData() { try { const d = localStorage.getItem('trackMasterV24'); if(d) state = { ...state, ...JSON.parse(d) }; else { const old = localStorage.getItem('trackMasterV18'); if(old) state = { ...state, ...JSON.parse(old) }; } updateUI(); } catch(e){} }
+        function saveData() { localStorage.setItem('trackMasterV24', JSON.stringify(state)); }
+
+        // --- 3. METEO & ECO & NAV ---
+        async function fetchWeather(lat, lon) {
+            try {
+                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,precipitation_probability&forecast_days=1`);
+                const data = await res.json();
+                const temp = Math.round(data.current.temperature_2m);
+                const rain = data.current.precipitation_probability;
+                let icon = rain > 50 ? '<i class="fa-solid fa-cloud-showers-heavy text-blue-400"></i>' : (rain > 20 ? '<i class="fa-solid fa-cloud-rain text-blue-300"></i>' : (temp > 20 ? '<i class="fa-solid fa-sun text-yellow-400"></i>' : '<i class="fa-solid fa-cloud text-slate-300"></i>'));
+                document.getElementById('weather-content').innerHTML = `<div class="text-xl font-bold text-white">${icon} ${temp}°C</div><div class="text-[10px] text-blue-300 font-bold">Pluie: ${rain}%</div>`;
+            } catch(e) { document.getElementById('weather-content').innerHTML = '<span class="text-xs text-red-400">Erreur météo</span>'; }
+        }
+
+        function saveEcoSettings() {
+            state.eco.car = parseFloat(document.getElementById('cost-car').value) || 0.20;
+            state.eco.scooter = parseFloat(document.getElementById('cost-scooter').value) || 0.05;
+            saveData(); updateUI();
+        }
+
+        function saveAddresses() {
+            state.addresses.home = document.getElementById('addr-home').value;
+            state.addresses.work = document.getElementById('addr-work').value;
+            saveData();
+        }
+
+        function openNav(type) {
+            const addr = state.addresses[type];
+            if(!addr) return alert("Veuillez configurer l'adresse dans le Garage.");
+            if(confirm("Ouvrir Waze pour aller à : " + addr + " ?")) {
+                window.open(`https://waze.com/ul?q=${encodeURIComponent(addr)}&navigate=yes`, '_blank');
+            } else if(confirm("Ou Google Maps ?")) {
+                window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addr)}`, '_blank');
+            }
+        }
+
+        // --- 4. GPS CORE ---
+        let map, polyline, marker, watchId, isTimerRunning=false, timerInterval, timerSeconds=0, currentTripDist=0, trackPoints=[], currentMaxSpeed=0;
+        let wakeLock=null; async function requestWakeLock(){ if('wakeLock' in navigator) try{ wakeLock=await navigator.wakeLock.request('screen'); document.getElementById('wake-icon').classList.add('wake-active'); }catch(e){} }
+        
+        window.onload = function() { loadData(); document.getElementById('input-date').valueAsDate = new Date(); initMap(); requestWakeLock(); };
+
+        function initMap() { 
+            map = L.map('map', {zoomControl:false}).setView([48.85, 2.35], 16);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {maxZoom: 20}).addTo(map);
+            const arrowIcon = L.divIcon({ className:'custom-div-icon', html:"<div class='nav-arrow-container'><div id='gps-arrow' class='nav-arrow'></div></div>", iconSize:[40,40], iconAnchor:[20,20] });
+            marker = L.marker([0,0], {icon: arrowIcon}).addTo(map);
+            polyline = L.polyline([], {color:'#10b981', weight:5}).addTo(map);
+        }
+
+        function centerMap() { if(!navigator.geolocation) return alert("Pas de GPS"); navigator.geolocation.getCurrentPosition(p=>{map.setView([p.coords.latitude, p.coords.longitude], 18);}); }
+
+        function toggleGPSMode() {
+            if(document.getElementById('gps-toggle').checked) {
+                if(!navigator.geolocation) return alert("GPS HS");
+                requestWakeLock();
+                // Fetch Weather once on start
+                navigator.geolocation.getCurrentPosition(p => fetchWeather(p.coords.latitude, p.coords.longitude));
+                
+                watchId = navigator.geolocation.watchPosition(pos => {
+                    const lat = pos.coords.latitude, lon = pos.coords.longitude;
+                    const spd = pos.coords.speed ? Math.round(pos.coords.speed*3.6) : 0;
+                    const alt = pos.coords.altitude ? Math.round(pos.coords.altitude) : 0;
+                    const heading = pos.coords.heading || 0;
+                    
+                    document.getElementById('gps-status').innerText = "ON"; document.getElementById('gps-status').className = "text-emerald-400 font-bold text-[8px]";
+                    document.getElementById('dash-speed').innerText = spd; document.getElementById('hud-speed').innerText = spd;
+                    document.getElementById('hud-alt').innerText = alt;
+                    marker.setLatLng([lat,lon]);
+                    const arrow = document.getElementById('gps-arrow'); if(arrow) arrow.style.transform = `rotate(${heading}deg)`;
+                    map.setView([lat,lon]);
+
+                    if(isTimerRunning) {
+                        if(spd > currentMaxSpeed) currentMaxSpeed = spd;
+                        if(pos.coords.accuracy && pos.coords.accuracy > 40) return; // Filter bad GPS
+                        trackPoints.push({lat, lon, ele: alt, time: new Date()});
+                        polyline.addLatLng([lat,lon]);
+                        if(trackPoints.length > 1) {
+                            const last = trackPoints[trackPoints.length-2];
+                            const d = 6371 * 2 * Math.atan2(Math.sqrt(Math.sin((lat-last.lat)*Math.PI/360)**2 + Math.cos(last.lat*Math.PI/180)*Math.cos(lat*Math.PI/180)*Math.sin((lon-last.lon)*Math.PI/360)**2), Math.sqrt(1-Math.sin((lat-last.lat)*Math.PI/360)**2 - Math.cos(last.lat*Math.PI/180)*Math.cos(lat*Math.PI/180)*Math.sin((lon-last.lon)*Math.PI/360)**2));
+                            if(d > 0.002) { currentTripDist += d; document.getElementById('dash-dist').innerText = currentTripDist.toFixed(2); document.getElementById('hud-dist').innerText = currentTripDist.toFixed(1); document.getElementById('input-dist').value = currentTripDist.toFixed(2); }
+                        }
+                        document.getElementById('btn-gpx').disabled = false; document.getElementById('btn-gpx').classList.remove('text-slate-400'); document.getElementById('btn-gpx').classList.add('text-white', 'border-accent');
+                    }
+                }, err => {}, {enableHighAccuracy:true});
+            } else { navigator.geolocation.clearWatch(watchId); document.getElementById('gps-status').innerText = "OFF"; document.getElementById('dash-speed').innerText = "0"; document.getElementById('hud-speed').innerText = "0"; }
+        }
+
+        // --- 5. LOGIC ---
+        function toggleTimer() {
+            const btn = document.getElementById('btn-timer'); const rec = document.getElementById('rec-dot');
+            if(!isTimerRunning) {
+                isTimerRunning=true; timerSeconds=0; currentTripDist=0; currentMaxSpeed=0; trackPoints=[]; polyline.setLatLngs([]);
+                btn.classList.replace('bg-accent','bg-red-500'); btn.classList.replace('text-slate-900','text-white');
+                rec.classList.replace('bg-slate-600', 'bg-red-500'); rec.classList.add('animate-pulse');
+                if(!document.getElementById('gps-toggle').checked) { document.getElementById('gps-toggle').checked=true; toggleGPSMode(); }
+                timerInterval = setInterval(()=>{ timerSeconds++; const h=Math.floor(timerSeconds/3600), m=Math.floor((timerSeconds%3600)/60), s=timerSeconds%60; const txt=`${h<10?'0'+h:h}:${m<10?'0'+m:m}:${s<10?'0'+s:s}`; document.getElementById('timer-display').innerText=txt; document.getElementById('hud-timer').innerText=txt; }, 1000);
+            } else { 
+                isTimerRunning=false; clearInterval(timerInterval); 
+                btn.classList.replace('bg-red-500','bg-accent'); btn.classList.replace('text-white','text-slate-900'); 
+                rec.classList.replace('bg-red-500', 'bg-slate-600'); rec.classList.remove('animate-pulse'); 
+            }
+        }
+        
+        function addLog() { 
+            if(isTimerRunning) toggleTimer(); 
+            const dist = parseFloat(document.getElementById('input-dist').value); if(!dist || dist<=0) return alert("0 km ?"); 
+            state.odo += dist; 
+            state.logs.unshift({id: Date.now(), title: document.getElementById('input-title').value||"Trajet", date: document.getElementById('input-date').value, dist: dist.toFixed(1), max: currentMaxSpeed}); 
+            saveData(); updateUI(); 
+            document.getElementById('input-dist').value = ""; document.getElementById('timer-display').innerText="00:00:00"; document.getElementById('hud-dist').innerText="0.0"; document.getElementById('hud-timer').innerText="00:00:00";
+            document.getElementById('btn-gpx').disabled = true; document.getElementById('btn-gpx').classList.add('text-slate-400'); document.getElementById('btn-gpx').classList.remove('text-white', 'border-accent');
+        }
+
+        // Utils
+        function saveMaintSettings() { const val=parseFloat(document.getElementById('maint-interval-input').value); if(val>0){state.maintInterval=val; saveData(); updateUI(); alert('OK');} }
+        function resetMaintenance() { if(confirm('Entretien fait ?')) { state.maintenanceKm = state.odo; saveData(); updateUI(); } }
+        function exportCurrentGPX() { if(trackPoints.length<2) return alert("Pas de trajet"); let gpx=`<?xml version="1.0"?><gpx version="1.1"><trk><trkseg>`; trackPoints.forEach(p=>{gpx+=`<trkpt lat="${p.lat}" lon="${p.lon}"><ele>${p.ele}</ele><time>${p.time.toISOString()}</time></trkpt>`;}); gpx+=`</trkseg></trk></gpx>`; const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([gpx],{type:'application/gpx+xml'})); a.download=`Trajet.gpx`; a.click(); }
+        function exportJSON() { const a=document.createElement('a'); a.href="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(state)); a.download="backup.json"; a.click(); }
+        function importJSON(i) { const r=new FileReader(); r.onload=e=>{ state={...state, ...JSON.parse(e.target.result)}; saveData(); updateUI(); alert("OK"); }; r.readAsText(i.files[0]); }
+        function deleteLog(id) { if(confirm('Supprimer ?')) { const i=state.logs.findIndex(l=>l.id===id); if(i>-1) { state.odo-=parseFloat(state.logs[i].dist); state.logs.splice(i,1); saveData(); updateUI(); } } }
+        function manualUpdateODO(v) { state.odo = parseFloat(v); saveData(); updateUI(); }
+        function switchTab(id) { document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active')); document.getElementById('tab-'+id).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(e=>e.classList.remove('active')); document.getElementById('nav-'+id).classList.add('active'); if(id==='map') setTimeout(()=>{ if(map) { map.invalidateSize(); centerMap(); } },200); } 
+
+        function updateUI() { 
+            if(document.getElementById('odo-input')) document.getElementById('odo-input').value = state.odo.toFixed(1);
+            // Maintenance
+            const last = state.maintenanceKm || 0; const interv = state.maintInterval || 500; const diff = state.odo - last; 
+            document.getElementById('maint-last').innerText = last.toFixed(0); document.getElementById('maint-next').innerText = (last + interv).toFixed(0);
+            document.getElementById('maint-remaining-text').innerText = "Reste: " + Math.max(0, interv - diff).toFixed(1) + " km";
+            const bar = document.getElementById('maint-bar'); bar.style.width = Math.min(100, (diff/interv)*100) + "%"; 
+            if(diff >= interv) { bar.classList.replace('bg-accent','bg-red-500'); document.getElementById('maint-alert').classList.remove('hidden'); } else { bar.classList.replace('bg-red-500','bg-accent'); document.getElementById('maint-alert').classList.add('hidden'); } 
+            
+            // Eco & Settings
+            document.getElementById('savings-display').innerText = ((state.eco.car - state.eco.scooter) * state.odo).toFixed(0);
+            document.getElementById('cost-car').value = state.eco.car; document.getElementById('cost-scooter').value = state.eco.scooter;
+            document.getElementById('addr-home').value = state.addresses.home || ""; document.getElementById('addr-work').value = state.addresses.work || "";
+
+            // Logs
+            const tb = document.getElementById('logs-table-body'); if(tb) { tb.innerHTML=''; if(state.logs.length===0) document.getElementById('empty-state').classList.remove('hidden'); else { document.getElementById('empty-state').classList.add('hidden'); state.logs.forEach(l => { const tr = document.createElement('tr'); tr.innerHTML = `<td class="py-2 px-1"><div class="font-bold text-slate-200">${l.title}</div><div class="text-[9px] text-slate-500">${l.date}</div></td><td class="py-2 px-1 text-right"><div class="text-accent font-bold">+${l.dist}</div><div class="text-[9px] text-slate-500">Max ${l.max||0} km/h</div></td><td class="py-2 px-1 text-right"><button onclick="deleteLog(${l.id})" class="text-slate-600 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td>`; tb.appendChild(tr); }); } }
+        }
+    </script>
+</body>
+</html>
