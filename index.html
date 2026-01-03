@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
@@ -12,7 +11,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2641/2641271.png">
     
-    <title>ScooterMaster V27 Chameleon</title>
+    <title>ScooterMaster V29</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -23,36 +22,20 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
-        tailwind.config = { 
-            theme: { 
-                extend: { 
-                    colors: { 
-                        slate: { 850: '#151f32', 900: '#0f172a' }, 
-                        accent: 'var(--accent-color)', // Couleur dynamique
-                        danger: '#ef4444', 
-                        warning: '#f59e0b'
-                    }, 
-                    fontFamily: { mono: ['ui-monospace', 'monospace'] } 
-                } 
-            } 
-        }
+        tailwind.config = { theme: { extend: { colors: { slate: { 850: '#151f32', 900: '#0f172a' }, accent: 'var(--accent-color)', danger: '#ef4444', warning: '#f59e0b', info: '#3b82f6' }, fontFamily: { mono: ['ui-monospace', 'monospace'] } } } }
     </script>
 
     <style>
-        :root { --accent-color: #10b981; } /* Couleur par défaut (Vert) */
-        
+        :root { --accent-color: #10b981; }
         body { background-color: #0f172a; color: #e2e8f0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
         .glass-panel { background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
         .digital-clock { text-shadow: 0 0 15px var(--accent-color); letter-spacing: -1px; transition: text-shadow 0.3s; }
         .dashboard-value { text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
         #map { height: 100%; width: 100%; border-radius: 0; z-index: 1; }
-        
-        /* Styles spécifiques */
         .wake-active { color: #fbbf24; text-shadow: 0 0 10px #fbbf24; }
         .nav-arrow { width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 20px solid var(--accent-color); filter: drop-shadow(0 0 5px rgba(0,0,0,0.5)); transition: transform 0.3s ease; }
         .nav-arrow-container { display: flex; justify-content: center; align-items: center; width: 40px; height: 40px; background: rgba(15, 23, 42, 0.5); border-radius: 50%; border: 2px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
         
-        /* PIN CODE */
         #login-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.98); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(10px); transition: opacity 0.5s; }
         .pin-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid #334155; transition: all 0.2s; }
         .pin-dot.filled { background: var(--accent-color); border-color: var(--accent-color); box-shadow: 0 0 10px var(--accent-color); }
@@ -60,12 +43,6 @@
         .numpad-btn:active { background: var(--accent-color); color: #0f172a; border-color: var(--accent-color); transform: scale(0.95); }
         #login-error { transition: opacity 0.3s; opacity: 0; }
 
-        /* SLIDER BATTERIE */
-        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: #ffffff; cursor: pointer; margin-top: -6px; box-shadow: 0 0 5px rgba(0,0,0,0.5); }
-        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #334155; border-radius: 2px; }
-
-        /* HUD & TABS */
         .tab-content { display: none; flex-direction: column; height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 6rem; }
         .tab-content.active { display: flex; }
         .nav-btn.active { color: var(--accent-color); background: rgba(255, 255, 255, 0.05); border-color: var(--accent-color); }
@@ -81,10 +58,12 @@
 </head>
 <body onclick="requestWakeLock()"> 
 
+    <input type="file" id="camera-trigger" accept="image/*" capture="environment" class="hidden">
+
     <div id="login-overlay">
         <div class="mb-8 flex flex-col items-center">
             <i class="fa-solid fa-crown text-4xl text-accent mb-4"></i>
-            <h2 class="text-white font-bold text-xl uppercase tracking-widest">Ultimate V27</h2>
+            <h2 class="text-white font-bold text-xl uppercase tracking-widest">Ultimate V29</h2>
             <p class="text-slate-500 text-xs mt-1">Code PIN requis</p>
             <p id="login-error" class="text-red-500 text-xs font-bold mt-2">Code Incorrect</p>
         </div>
@@ -100,26 +79,23 @@
     <div id="app-modal" class="fixed inset-0 z-[1000] bg-slate-900/90 backdrop-blur-sm hidden flex-col items-center justify-center p-6">
         <div class="glass-panel w-full max-w-sm p-5 rounded-2xl border border-slate-600 shadow-2xl relative">
             <h3 class="text-white font-bold text-lg mb-4 text-center">Ajouter un raccourci</h3>
-            
             <label class="block text-xs text-slate-400 mb-1">Type d'application</label>
             <select id="app-select" onchange="prefillApp()" class="w-full bg-slate-950 border border-slate-700 rounded p-3 text-white mb-3 outline-none focus:border-accent">
                 <option value="custom">-- Choisir --</option>
-                <option value="camera||fa-solid fa-camera|#ffffff">Appareil Photo (Lien)</option>
-                <option value="spotify|spotify:|fa-brands fa-spotify|#1DB954">Spotify</option>
-                <option value="deezer|deezer:|fa-brands fa-deezer|#a255ff">Deezer</option>
-                <option value="waze|https://waze.com/ul|fa-brands fa-waze|#3b82f6">Waze</option>
-                <option value="maps|https://maps.google.com|fa-solid fa-map-location-dot|#10b981">Google Maps</option>
-                <option value="calc||fa-solid fa-calculator|#fbbf24">Calculatrice</option>
-                <option value="tel|tel:|fa-solid fa-phone|#ffffff">Téléphone</option>
+                <option value="cam_direct|Caméra|internal:camera|fa-solid fa-camera|#ffffff">Appareil Photo (Direct)</option>
+                <option value="calc_web|Calculatrice|https://www.google.com/search?q=calculator|fa-solid fa-calculator|#fbbf24">Calculatrice (Web)</option>
+                <option value="spotify|Spotify|spotify:|fa-brands fa-spotify|#1DB954">Spotify</option>
+                <option value="deezer|Deezer|deezer:|fa-brands fa-deezer|#a255ff">Deezer</option>
+                <option value="waze|Waze|https://waze.com/ul|fa-brands fa-waze|#3b82f6">Waze</option>
+                <option value="maps|Maps|https://maps.google.com|fa-solid fa-map-location-dot|#10b981">Google Maps</option>
+                <option value="tel|Téléphone|tel:|fa-solid fa-phone|#ffffff">Téléphone</option>
             </select>
-    
             <label class="block text-xs text-slate-400 mb-1">Nom</label>
             <input type="text" id="app-name" class="w-full bg-slate-800 border border-slate-600 rounded p-2 text-white mb-3 outline-none text-sm">
             <label class="block text-xs text-slate-400 mb-1">Lien / URI</label>
             <input type="text" id="app-url" class="w-full bg-slate-800 border border-slate-600 rounded p-2 text-white mb-3 outline-none text-xs font-mono">
             <input type="hidden" id="app-icon" value="fa-solid fa-cube">
             <input type="hidden" id="app-color" value="#ffffff">
-    
             <div class="grid grid-cols-2 gap-3 mt-4">
                 <button onclick="closeAppModal()" class="bg-slate-700 text-slate-300 py-3 rounded-xl font-bold">Annuler</button>
                 <button onclick="saveShortcut()" class="bg-accent text-slate-900 py-3 rounded-xl font-bold">Sauver</button>
@@ -129,7 +105,7 @@
     </div>
 
     <nav class="glass-panel sticky top-0 z-50 border-b border-slate-700/50 pt-safe-top h-16 flex-none flex justify-between items-center px-4">
-        <div class="flex items-center gap-2 text-slate-500 z-10 w-20"><i class="fa-solid fa-bolt text-accent"></i> <span class="text-[10px] font-bold uppercase tracking-wider">V27</span></div>
+        <div class="flex items-center gap-2 text-slate-500 z-10 w-20"><i class="fa-solid fa-bolt text-accent"></i> <span class="text-[10px] font-bold uppercase tracking-wider">V29</span></div>
         <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center gap-3"><div class="text-3xl font-black text-white digital-clock font-mono" id="clock-display">--:--</div></div>
         <div class="flex items-center justify-end gap-3 z-10 w-auto">
             <div id="top-weather" class="flex items-center gap-2 text-xs font-bold text-slate-300"><span class="text-[9px] opacity-50">GPS?</span></div>
@@ -164,16 +140,15 @@
                 </div>
             </div>
 
-            <div class="glass-panel rounded-xl p-3 border border-slate-600 flex-none flex flex-col justify-center">
-                <div class="flex justify-between items-end mb-1">
-                    <span class="text-[9px] text-slate-400 uppercase font-bold"><i class="fa-solid fa-battery-half mr-1 text-accent"></i>Batterie</span>
-                    <span class="text-xs font-bold text-white"><span id="batt-percent">100</span>%</span>
+            <div class="glass-panel rounded-xl p-3 border border-slate-600 flex-none flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-battery-half text-2xl text-accent"></i>
+                    <div class="flex flex-col">
+                        <span class="text-[9px] text-slate-400 uppercase font-bold">Autonomie Estimée</span>
+                        <div class="text-sm font-bold text-white">Reste <span id="batt-range-dash" class="text-accent text-lg">0</span> km</div>
+                    </div>
                 </div>
-                <input type="range" min="0" max="100" value="100" class="w-full h-1 mb-2 bg-slate-700 rounded-lg appearance-none cursor-pointer" oninput="updateBattery(this.value)">
-                <div class="text-center">
-                    <span class="text-[9px] text-slate-500">Autonomie estimée</span>
-                    <div class="text-lg font-bold text-accent leading-none"><span id="batt-range">0</span> km</div>
-                </div>
+                <div class="text-[8px] text-slate-500 italic max-w-[100px] text-right">Basé sur GPS et Max (Garage)</div>
             </div>
 
             <div class="grid grid-cols-2 gap-2 flex-none">
@@ -181,9 +156,9 @@
                 <div class="glass-panel rounded-xl p-2 flex flex-col items-center justify-center bg-slate-800/60 border-r-2 border-r-accent"><span class="text-slate-500 text-[9px] font-bold uppercase">Session</span><div class="flex items-baseline"><span id="dash-dist" class="text-3xl font-bold text-white dashboard-value font-mono leading-none">0.0</span><span class="text-[10px] text-accent ml-1">km</span></div></div>
             </div>
 
-            <div class="glass-panel rounded-xl p-3 border border-slate-600 flex-none shadow-lg mt-1 relative">
-                <button onclick="toggleEditMode('main')" id="edit-mode-btn-main" class="absolute top-2 right-2 text-[9px] text-slate-500 hover:text-white"><i class="fa-solid fa-pen"></i></button>
+            <div class="glass-panel rounded-xl p-2 border border-slate-600 flex-none shadow-lg mt-1 relative">
                 <div class="grid grid-cols-4 gap-2" id="shortcut-grid-main"></div>
+                <button onclick="toggleEditMode('main')" id="edit-mode-btn-main" class="absolute top-1 right-1 text-[8px] text-slate-600 hover:text-white p-1"><i class="fa-solid fa-pen"></i></button>
             </div>
 
             <div class="glass-panel rounded-xl p-2 border border-slate-600 flex-none shadow-lg mt-1 relative">
@@ -246,6 +221,9 @@
                 <div class="text-2xl font-bold font-mono text-white"><span id="hud-alt">0</span><span class="text-xs text-slate-400 ml-1">m</span></div>
                 <div class="text-[10px] text-slate-400 uppercase font-bold mt-2">Distance</div>
                 <div class="text-2xl font-bold font-mono text-accent"><span id="hud-dist">0.0</span><span class="text-xs text-slate-400 ml-1">km</span></div>
+                
+                <div class="text-[10px] text-slate-400 uppercase font-bold mt-2">Autonomie</div>
+                <div class="text-2xl font-bold font-mono text-white"><span id="hud-range">0.0</span><span class="text-xs text-accent ml-1">km</span></div>
             </div>
             <div class="hud-overlay hud-bottom-center glass-panel p-3 rounded-xl flex justify-between items-center bg-slate-900/90 border border-slate-600">
                 <div class="flex items-center gap-2">
@@ -278,6 +256,19 @@
                 </div>
             </div>
 
+            <div class="glass-panel rounded-xl p-4 border border-slate-600 flex-none">
+                 <h3 class="text-white text-xs uppercase font-bold mb-3"><i class="fa-solid fa-battery-full mr-2 text-accent"></i>Gestion Batterie</h3>
+                 <div class="text-xs mb-3">
+                     <label class="text-slate-500 block mb-1">Capacité MAX (km)</label>
+                     <div class="flex gap-2">
+                         <input type="number" id="battery-max-range" onchange="saveBatterySettings()" class="bg-slate-900 border border-slate-700 rounded px-2 py-2 text-white w-full" placeholder="Ex: 40">
+                         <span class="p-2 text-slate-500">km</span>
+                     </div>
+                 </div>
+                 <button onclick="resetBatteryToFull()" class="w-full bg-accent text-slate-900 font-bold py-3 rounded-lg text-xs uppercase"><i class="fa-solid fa-bolt mr-2"></i> Recharge 100%</button>
+                 <p class="text-[9px] text-slate-500 mt-2 italic">Cliquez ici quand vous avez rechargé à fond. L'autonomie descendra automatiquement en roulant.</p>
+            </div>
+
             <div class="glass-panel rounded-xl p-4 bg-slate-900/60 border border-slate-600 text-center flex-none">
                 <span class="text-[10px] text-slate-400 uppercase font-bold mb-1">Odomètre Total</span>
                 <div class="flex items-center justify-center gap-2 mt-2"><input type="number" id="odo-input" step="0.1" onchange="manualUpdateODO(this.value)" class="bg-transparent text-4xl font-mono font-black text-white w-40 text-center focus:outline-none border-b border-transparent focus:border-accent p-0 leading-none" placeholder="0.0"><span class="text-sm text-slate-500 font-bold">km</span></div>
@@ -294,17 +285,6 @@
                 <div class="h-40 w-full relative">
                     <canvas id="rideChart"></canvas>
                 </div>
-            </div>
-
-            <div class="glass-panel rounded-xl p-4 border border-slate-600 flex-none">
-                 <h3 class="text-white text-xs uppercase font-bold mb-3"><i class="fa-solid fa-battery-full mr-2 text-accent"></i>Batterie</h3>
-                 <div class="text-xs">
-                     <label class="text-slate-500 block mb-1">Autonomie Max (100%)</label>
-                     <div class="flex gap-2">
-                         <input type="number" id="battery-max-range" onchange="saveBatterySettings()" class="bg-slate-900 border border-slate-700 rounded px-2 py-2 text-white w-full" placeholder="Ex: 40">
-                         <span class="p-2 text-slate-500">km</span>
-                     </div>
-                 </div>
             </div>
 
             <div class="glass-panel rounded-xl p-4 border border-slate-600 relative overflow-hidden flex-none">
@@ -366,7 +346,7 @@
         let state = { 
             odo: 0, tripA: 0, tripB: 0, maintenance: null, logs: [], addresses: {home:'', work:''}, eco: {car: 0.20, scooter: 0.05}, 
             shortcutsMain: [null,null,null,null], shortcutsMini: [null,null,null,null],
-            themeColor: '#10b981', batteryMax: 40
+            themeColor: '#10b981', batteryMax: 40, batteryCurrent: 40
         };
         
         function loadData() { 
@@ -386,8 +366,8 @@
                 if(!state.shortcutsMain) state.shortcutsMain = [null,null,null,null];
                 if(!state.shortcutsMini) state.shortcutsMini = [null,null,null,null];
                 if(isNaN(state.tripA)) state.tripA = 0; if(isNaN(state.tripB)) state.tripB = 0;
+                if(typeof state.batteryCurrent === 'undefined') state.batteryCurrent = state.batteryMax;
                 
-                // Appliquer le thème sauvegardé
                 applyTheme(state.themeColor || '#10b981');
                 updateUI(); 
             } catch(e){} 
@@ -399,23 +379,22 @@
             document.documentElement.style.setProperty('--accent-color', color);
             state.themeColor = color;
             saveData();
-            // Update dots UI
             document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected'));
-            // Update map if needed (reload polyline color?) - simplified for now
             if(polyline) polyline.setStyle({color: color});
         }
 
         // --- BATTERY ENGINE ---
-        function updateBattery(val) {
-            document.getElementById('batt-percent').innerText = val;
-            const range = Math.round((val / 100) * (state.batteryMax || 40));
-            document.getElementById('batt-range').innerText = range;
-        }
         function saveBatterySettings() {
             state.batteryMax = parseFloat(document.getElementById('battery-max-range').value) || 40;
             saveData();
-            // Refresh dashboard calculation based on current slider value
-            updateBattery(document.querySelector('input[type=range]').value);
+            updateUI();
+        }
+        function resetBatteryToFull() {
+            if(confirm('Recharge complète confirmée ?')) {
+                state.batteryCurrent = state.batteryMax;
+                saveData();
+                updateUI();
+            }
         }
 
         // --- METEO & NAV ---
@@ -497,7 +476,16 @@
                         if(trackPoints.length > 1) {
                             const last = trackPoints[trackPoints.length-2];
                             const d = 6371 * 2 * Math.atan2(Math.sqrt(Math.sin((lat-last.lat)*Math.PI/360)**2 + Math.cos(last.lat*Math.PI/180)*Math.cos(lat*Math.PI/180)*Math.sin((lon-last.lon)*Math.PI/360)**2), Math.sqrt(1-Math.sin((lat-last.lat)*Math.PI/360)**2 - Math.cos(last.lat*Math.PI/180)*Math.cos(lat*Math.PI/180)*Math.sin((lon-last.lon)*Math.PI/360)**2));
-                            if(d > 0.002) { currentTripDist += d; document.getElementById('dash-dist').innerText = currentTripDist.toFixed(2); document.getElementById('hud-dist').innerText = currentTripDist.toFixed(1); document.getElementById('input-dist').value = currentTripDist.toFixed(2); }
+                            if(d > 0.002) { 
+                                currentTripDist += d; 
+                                state.batteryCurrent -= d; // Decrease battery
+                                if(state.batteryCurrent < 0) state.batteryCurrent = 0;
+                                saveData(); // Save real-time battery status
+                                updateUI(); // Update UI for battery
+                                document.getElementById('dash-dist').innerText = currentTripDist.toFixed(2); 
+                                document.getElementById('hud-dist').innerText = currentTripDist.toFixed(1); 
+                                document.getElementById('input-dist').value = currentTripDist.toFixed(2); 
+                            }
                         }
                         document.getElementById('btn-gpx').disabled = false; document.getElementById('btn-gpx').classList.remove('text-slate-400'); document.getElementById('btn-gpx').classList.add('text-white', 'border-accent');
                     }
@@ -556,80 +544,71 @@
 
         // --- CHART (DIST / ALT) ---
         let chartInstance = null;
-        let chartMode = 'dist'; // 'dist' or 'alt'
+        let chartMode = 'dist'; 
         function setChartMode(m) { chartMode = m; document.getElementById('btn-chart-dist').className = m==='dist' ? "text-[9px] px-2 py-0.5 rounded text-slate-300 bg-slate-600" : "text-[9px] px-2 py-0.5 rounded text-slate-500"; document.getElementById('btn-chart-alt').className = m==='alt' ? "text-[9px] px-2 py-0.5 rounded text-slate-300 bg-slate-600" : "text-[9px] px-2 py-0.5 rounded text-slate-500"; renderChart(); }
 
         function renderChart() {
             const ctx = document.getElementById('rideChart'); if(!ctx) return;
             if(chartInstance) chartInstance.destroy();
             let labels=[], data=[], color = state.themeColor;
-
             if(chartMode === 'dist') {
                 const logs = state.logs.slice(0, 7).reverse();
                 labels = logs.map(l => l.date.substring(5));
                 data = logs.map(l => parseFloat(l.dist));
             } else {
-                // Altitude du dernier log
                 if(state.logs.length > 0 && state.logs[0].track) {
                     const track = state.logs[0].track;
-                    // Echantillonner pour pas surcharger (1 point sur 10)
-                    for(let i=0; i<track.length; i+=Math.max(1, Math.floor(track.length/50))) {
-                        labels.push(""); // Pas de label pour alt
-                        data.push(track[i].ele);
-                    }
-                    color = '#3b82f6'; // Bleu pour alt
-                } else {
-                    labels = ["No Data"]; data = [0];
-                }
+                    for(let i=0; i<track.length; i+=Math.max(1, Math.floor(track.length/50))) { labels.push(""); data.push(track[i].ele); }
+                    color = '#3b82f6';
+                } else { labels = ["No Data"]; data = [0]; }
             }
-
             chartInstance = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ label: chartMode, data: data, borderColor: color, backgroundColor: color+'33', borderWidth: 2, tension: 0.4, fill: true, pointRadius: chartMode==='alt'?0:3 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#94a3b8', font: {size:8} } }, x: { display: true, grid: { display: false }, ticks: { color: '#94a3b8', font: {size:8} } } } } });
         }
 
-        // --- SHORTCUTS ENGINE (Unified for Main & Mini) ---
-        let editTarget = null; // 'main' or 'mini'
+        // --- SHORTCUTS ENGINE (Unified Mini) ---
+        let editTarget = null; 
         let currentSlotIndex = -1;
 
-        function renderShortcuts(type) { // type = 'main' or 'mini'
+        function renderShortcuts(type) { 
             const grid = document.getElementById(`shortcut-grid-${type}`); if(!grid) return; grid.innerHTML = '';
             const list = type === 'main' ? state.shortcutsMain : state.shortcutsMini;
             const isEditing = (editTarget === type);
-            const heightClass = type === 'main' ? 'h-16' : 'h-10'; // Mini plus petit
+            // On force la taille Mini pour les deux (h-11 = 44px environ)
+            const heightClass = 'h-11'; 
 
             list.forEach((app, index) => {
                 const btn = document.createElement('div');
                 if (app) {
-                    let action = isEditing ? `openAppModal('${type}', ${index})` : `window.location.href='${app.url}'`;
-                    if (!isEditing && app.url.startsWith('http')) { action = `window.open('${app.url}', '_blank')`; }
-                    btn.className = `relative ${heightClass} rounded-xl flex flex-col items-center justify-center gap-1 transition active:scale-95 cursor-pointer overflow-hidden border ${isEditing ? 'border-yellow-500 bg-yellow-500/10 animate-pulse' : 'border-slate-700 bg-slate-800/50 hover:bg-slate-700'}`;
+                    // Si URL speciale camera
+                    let action = `window.location.href='${app.url}'`;
+                    if(app.url === 'internal:camera') action = "document.getElementById('camera-trigger').click()";
+                    else if (!isEditing && app.url.startsWith('http')) action = `window.open('${app.url}', '_blank')`;
+                    
+                    if(isEditing) action = `openAppModal('${type}', ${index})`;
+
+                    btn.className = `relative ${heightClass} rounded-xl flex flex-col items-center justify-center gap-0.5 transition active:scale-95 cursor-pointer overflow-hidden border ${isEditing ? 'border-yellow-500 bg-yellow-500/10 animate-pulse' : 'border-slate-700 bg-slate-800/50 hover:bg-slate-700'}`;
                     btn.setAttribute('onclick', action);
-                    // Couleur dynamique sauf si en édition
                     btn.style.borderColor = isEditing ? '#eab308' : (app.color + '40');
-                    // Icon size adaptative
-                    const iconSize = type === 'main' ? 'text-xl' : 'text-sm';
-                    const textSize = type === 'main' ? 'text-[8px]' : 'text-[7px]';
-                    btn.innerHTML = `<i class="${app.icon} ${iconSize} mb-0.5" style="color: ${app.color}"></i><span class="${textSize} font-bold text-slate-300 truncate w-full text-center px-1">${app.name}</span>${isEditing ? '<div class="absolute top-0 right-0 text-[7px] text-yellow-500 p-0.5"><i class="fa-solid fa-pencil"></i></div>' : ''}`;
+                    
+                    btn.innerHTML = `<i class="${app.icon} text-sm mb-0.5" style="color: ${app.color}"></i><span class="text-[7px] font-bold text-slate-300 truncate w-full text-center px-1">${app.name}</span>${isEditing ? '<div class="absolute top-0 right-0 text-[7px] text-yellow-500 p-0.5"><i class="fa-solid fa-pencil"></i></div>' : ''}`;
                 } else {
                     btn.className = `${heightClass} rounded-xl border border-dashed border-slate-700 flex items-center justify-center text-slate-600 hover:text-accent hover:border-accent transition cursor-pointer active:scale-95 bg-slate-900/30`;
                     btn.onclick = () => openAppModal(type, index);
-                    btn.innerHTML = `<i class="fa-solid fa-plus ${type==='main'?'text-lg':'text-xs'}"></i>`;
+                    btn.innerHTML = `<i class="fa-solid fa-plus text-xs"></i>`;
                 }
                 grid.appendChild(btn);
             });
         }
 
         function toggleEditMode(type) {
-            if(editTarget && editTarget !== type) toggleEditMode(editTarget); // Close other if open
+            if(editTarget && editTarget !== type) toggleEditMode(editTarget); 
             editTarget = (editTarget === type) ? null : type;
             renderShortcuts(type);
         }
 
         function openAppModal(type, index) {
-            currentSlotIndex = index; // On garde juste l'index, le type est dans editTarget ou passé ici?
-            // Hack: store type temporarily in a global or reuse editTarget logic if active. 
-            // Better: use the passed type.
+            currentSlotIndex = index; 
             window.modalTargetType = type; 
-            
             const modal = document.getElementById('app-modal');
             const list = type === 'main' ? state.shortcutsMain : state.shortcutsMini;
             const existing = list[index];
@@ -653,13 +632,10 @@
             const name = document.getElementById('app-name').value; const url = document.getElementById('app-url').value;
             const icon = document.getElementById('app-icon').value; const color = document.getElementById('app-color').value;
             if (!name || !url) return alert("Nom et lien requis");
-            
             const type = window.modalTargetType;
             if(type === 'main') state.shortcutsMain[currentSlotIndex] = { name, url, icon, color };
             else state.shortcutsMini[currentSlotIndex] = { name, url, icon, color };
-            
-            saveData(); renderShortcuts(type); closeAppModal(); 
-            if(editTarget === type) toggleEditMode(type); 
+            saveData(); renderShortcuts(type); closeAppModal(); if(editTarget === type) toggleEditMode(type); 
         }
 
         function deleteCurrentShortcut() { 
@@ -671,18 +647,12 @@
             } 
         }
 
-        // Utils Generiques
         function exportCurrentGPX() { if(trackPoints.length<2) return alert("Pas de trajet"); let gpx=`<?xml version="1.0"?><gpx version="1.1"><trk><trkseg>`; trackPoints.forEach(p=>{gpx+=`<trkpt lat="${p.lat}" lon="${p.lon}"><ele>${p.ele}</ele><time>${p.time.toISOString()}</time></trkpt>`;}); gpx+=`</trkseg></trk></gpx>`; const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([gpx],{type:'application/gpx+xml'})); a.download=`Trajet.gpx`; a.click(); }
         function exportJSON() { const a=document.createElement('a'); a.href="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(state)); a.download="backup.json"; a.click(); }
         function importJSON(i) { const r=new FileReader(); r.onload=e=>{ state={...state, ...JSON.parse(e.target.result)}; saveData(); updateUI(); alert("OK"); }; r.readAsText(i.files[0]); }
         function deleteLog(id) { if(confirm('Supprimer ?')) { const i=state.logs.findIndex(l=>l.id===id); if(i>-1) { state.odo-=parseFloat(state.logs[i].dist); state.logs.splice(i,1); saveData(); updateUI(); } } }
         function manualUpdateODO(v) { state.odo = parseFloat(v); saveData(); updateUI(); }
-        function switchTab(id) { 
-            document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active')); document.getElementById('tab-'+id).classList.add('active'); 
-            document.querySelectorAll('.nav-btn').forEach(e=>e.classList.remove('active')); document.getElementById('nav-'+id).classList.add('active'); 
-            if(id==='map') setTimeout(()=>{ if(map) { map.invalidateSize(); centerMap(); } },200); 
-            if(id==='garage') renderChart(); 
-        } 
+        function switchTab(id) { document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active')); document.getElementById('tab-'+id).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(e=>e.classList.remove('active')); document.getElementById('nav-'+id).classList.add('active'); if(id==='map') setTimeout(()=>{ if(map) { map.invalidateSize(); centerMap(); } },200); if(id==='garage') renderChart(); } 
 
         function updateUI() { 
             if(document.getElementById('odo-input')) document.getElementById('odo-input').value = state.odo.toFixed(1);
@@ -690,6 +660,10 @@
             document.getElementById('disp-trip-a').innerText = (state.tripA || 0).toFixed(1);
             document.getElementById('disp-trip-b').innerText = (state.tripB || 0).toFixed(1);
             document.getElementById('battery-max-range').value = state.batteryMax || 40;
+            
+            // Updates battery displays
+            document.getElementById('batt-range-dash').innerText = (state.batteryCurrent || 0).toFixed(1);
+            document.getElementById('hud-range').innerText = (state.batteryCurrent || 0).toFixed(1);
 
             const cont = document.getElementById('maintenance-container');
             if(cont && state.maintenance) {
@@ -727,9 +701,6 @@
             renderShortcuts('main');
             renderShortcuts('mini');
             if(document.getElementById('tab-garage').classList.contains('active')) renderChart();
-            
-            // Re-apply current battery estimation
-            updateBattery(document.querySelector('input[type=range]').value);
         }
     </script>
 </body>
