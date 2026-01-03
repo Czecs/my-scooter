@@ -11,7 +11,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2641/2641271.png">
     
-    <title>ScooterMaster V48</title>
+    <title>ScooterMaster V51</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -36,11 +36,13 @@
         .nav-arrow { width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 20px solid var(--accent-color); filter: drop-shadow(0 0 5px rgba(0,0,0,0.5)); transition: transform 0.3s ease; }
         .nav-arrow-container { display: flex; justify-content: center; align-items: center; width: 40px; height: 40px; background: rgba(15, 23, 42, 0.5); border-radius: 50%; border: 2px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
         
+        /* LAYERS */
         #login-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.98); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(10px); transition: opacity 0.5s; }
         #app-modal { position: fixed; inset: 0; z-index: 9500; display: none; backdrop-filter: blur(5px); background: rgba(15, 23, 42, 0.9); justify-content: center; align-items: center; }
         #app-modal.flex { display: flex; }
         #battery-alert-modal { position: fixed; inset: 0; z-index: 9600; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
         
+        /* Calc overlay caché par défaut avec !important */
         #calc-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.95); z-index: 9000; display: none !important; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
         #calc-overlay.flex { display: flex !important; }
 
@@ -73,6 +75,8 @@
 </head>
 <body onclick="requestWakeLock()"> 
 
+    <input type="file" id="camera-trigger" accept="image/*" capture="environment" class="hidden">
+
     <div id="battery-alert-modal">
         <div class="glass-panel p-6 rounded-2xl w-3/4 max-w-sm border border-red-500 shadow-2xl text-center">
             <i class="fa-solid fa-triangle-exclamation text-red-500 text-4xl mb-4 animate-pulse"></i>
@@ -85,7 +89,7 @@
     <div id="login-overlay">
         <div class="mb-8 flex flex-col items-center">
             <i class="fa-solid fa-crown text-4xl text-accent mb-4"></i>
-            <h2 class="text-white font-bold text-xl uppercase tracking-widest">Ultimate V48</h2>
+            <h2 class="text-white font-bold text-xl uppercase tracking-widest">Ultimate V51</h2>
             <p class="text-slate-500 text-xs mt-1">Code PIN requis</p>
             <p id="login-error" class="text-red-500 text-xs font-bold mt-2">Code Incorrect</p>
         </div>
@@ -137,14 +141,31 @@
             <select id="app-select" onchange="prefillApp()" class="w-full bg-slate-950 border border-slate-700 rounded p-3 text-white mb-3 outline-none focus:border-accent">
                 <option value="custom">-- Choisir --</option>
                 <option value="sys_calc|Calculatrice (Interne)|sys_calc|fa-solid fa-calculator|#fbbf24">Calculatrice (Interne)</option>
-                <option value="WhatsApp|whatsapp://send?text=|fa-brands fa-whatsapp|#25D366">WhatsApp</option>
-                <option value="Messenger|fb-messenger://|fa-brands fa-facebook-messenger|#0084FF">Messenger</option>
-                <option value="Telegram|tg://|fa-brands fa-telegram|#0088cc">Telegram</option>
-                <option value="Spotify|spotify:|fa-brands fa-spotify|#1DB954">Spotify</option>
-                <option value="Deezer|deezer:|fa-brands fa-deezer|#a255ff">Deezer</option>
-                <option value="Waze|https://waze.com/ul|fa-brands fa-waze|#3b82f6">Waze</option>
-                <option value="maps|Maps|https://maps.google.com|fa-solid fa-map-location-dot|#10b981">Google Maps</option>
-                <option value="tel|Téléphone|tel:|fa-solid fa-phone|#ffffff">Téléphone</option>
+                
+                <optgroup label="Communication">
+                    <option value="WhatsApp|https://whatsapp.com/dl/|fa-brands fa-whatsapp|#25D366">WhatsApp</option>
+                    <option value="Messenger|https://m.me/|fa-brands fa-facebook-messenger|#0084FF">Messenger</option>
+                    <option value="Telegram|https://t.me/|fa-brands fa-telegram|#0088cc">Telegram</option>
+                    <option value="Téléphone|tel:|fa-solid fa-phone|#ffffff">Téléphone</option>
+                </optgroup>
+                
+                <optgroup label="Musique">
+                    <option value="Spotify|https://open.spotify.com|fa-brands fa-spotify|#1DB954">Spotify</option>
+                    <option value="Deezer|https://www.deezer.com|fa-brands fa-deezer|#a255ff">Deezer</option>
+                    <option value="YouTube Music|https://music.youtube.com|fa-brands fa-youtube|#ef4444">YouTube Music</option>
+                </optgroup>
+                
+                <optgroup label="Navigation">
+                    <option value="Waze|https://waze.com/ul|fa-brands fa-waze|#3b82f6">Waze</option>
+                    <option value="Maps|https://maps.google.com|fa-solid fa-map-location-dot|#10b981">Google Maps</option>
+                </optgroup>
+                
+                <optgroup label="Réseaux">
+                    <option value="Facebook|https://facebook.com|fa-brands fa-facebook|#1877F2">Facebook</option>
+                    <option value="Instagram|https://instagram.com|fa-brands fa-instagram|#E4405F">Instagram</option>
+                    <option value="TikTok|https://tiktok.com|fa-brands fa-tiktok|#ffffff">TikTok</option>
+                    <option value="Snapchat|https://snapchat.com|fa-brands fa-snapchat|#FFFC00">Snapchat</option>
+                </optgroup>
             </select>
             <label class="block text-xs text-slate-400 mb-1">Nom</label>
             <input type="text" id="app-name" class="w-full bg-slate-800 border border-slate-600 rounded p-2 text-white mb-3 outline-none text-sm">
@@ -161,7 +182,7 @@
     </div>
 
     <nav class="glass-panel sticky top-0 z-50 border-b border-slate-700/50 pt-safe-top h-16 flex-none flex justify-between items-center px-4">
-        <div class="flex items-center gap-2 text-slate-500 z-10 w-20"><i class="fa-solid fa-bolt text-accent"></i> <span class="text-[10px] font-bold uppercase tracking-wider">V48</span></div>
+        <div class="flex items-center gap-2 text-slate-500 z-10 w-20"><i class="fa-solid fa-bolt text-accent"></i> <span class="text-[10px] font-bold uppercase tracking-wider">V51</span></div>
         <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center gap-3"><div class="text-3xl font-black text-white digital-clock font-mono" id="clock-display">--:--</div></div>
         <div class="flex items-center justify-end gap-3 z-10 w-auto">
             <div id="top-weather" class="flex items-center gap-2 text-xs font-bold text-slate-300"><span class="text-[9px] opacity-50">GPS?</span></div>
@@ -403,10 +424,11 @@
                     const loaded = JSON.parse(d);
                     state = { ...state, ...loaded };
                     
-                    // --- CLEANUP CORRUPTED SHORTCUTS ---
+                    // --- NETTOYAGE AUTOMATIQUE DES LIENS CORROMPUS ---
+                    // Si on détecte un ancien lien whatsapp:// ou wa.me/ qui bug, on le supprime pour forcer le propre
                     if (state.shortcutsMain) {
                         state.shortcutsMain = state.shortcutsMain.map(s => 
-                            (s && (s.url.includes('camera') || s.url.includes('cam_'))) ? null : s
+                            (s && (s.url.includes('wa.me') || s.url.includes('whatsapp://'))) ? null : s
                         );
                     }
                     
@@ -465,18 +487,11 @@
             // Internal Calc Check
             if(url === 'sys_calc' || url.includes('calc')) { openCalc(); return; }
             
-            // SPECIAL HANDLING FOR APPS
-            if(url.startsWith('whatsapp://') || url.startsWith('fb-messenger://') || url.startsWith('tg://')) {
-                // Try to open app directly
-                window.location.href = url;
-                return;
-            }
-
-            // Standard Web Open
+            // Standard Web Open (HTTPS)
             if(url.startsWith('http')) { 
                 window.open(url, '_blank'); 
             } else { 
-                // Fallback
+                // URI schemes fallback
                 window.location.href = url; 
             }
         }
@@ -634,7 +649,7 @@
         function resetMultiMaint(key) { if(confirm('Reset '+key+'?')) { state.maintenance[key].last = state.odo; saveData(); updateUI(); } }
         function setMaintInterval(key) { const v=prompt("Intervalle:"); if(v&&!isNaN(v)){ state.maintenance[key].interval=parseFloat(v); saveData(); updateUI(); } }
 
-        // --- CHART ---
+        // --- CHART (DIST / ALT) ---
         let chartInstance = null; let chartMode = 'dist'; 
         function setChartMode(m) { chartMode = m; document.getElementById('btn-chart-dist').className = m==='dist' ? "text-[9px] px-2 py-0.5 rounded text-slate-300 bg-slate-600" : "text-[9px] px-2 py-0.5 rounded text-slate-500"; document.getElementById('btn-chart-alt').className = m==='alt' ? "text-[9px] px-2 py-0.5 rounded text-slate-300 bg-slate-600" : "text-[9px] px-2 py-0.5 rounded text-slate-500"; renderChart(); }
         function renderChart() {
