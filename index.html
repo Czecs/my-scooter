@@ -11,7 +11,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2641/2641271.png">
     
-    <title>ScooterMaster V39</title>
+    <title>ScooterMaster V40</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -37,14 +37,9 @@
         .nav-arrow-container { display: flex; justify-content: center; align-items: center; width: 40px; height: 40px; background: rgba(15, 23, 42, 0.5); border-radius: 50%; border: 2px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
         
         #login-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.98); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(10px); transition: opacity 0.5s; }
-        
-        /* Calc overlay caché par défaut avec !important */
         #calc-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.95); z-index: 9000; display: none !important; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        
         #app-modal { position: fixed; inset: 0; z-index: 9500; display: none; backdrop-filter: blur(5px); background: rgba(15, 23, 42, 0.9); justify-content: center; align-items: center; }
         #app-modal.flex { display: flex; }
-
-        /* ALERTE BATTERIE */
         #battery-alert-modal { position: fixed; inset: 0; z-index: 9600; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
 
         .pin-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid #334155; transition: all 0.2s; }
@@ -90,7 +85,7 @@
     <div id="login-overlay">
         <div class="mb-8 flex flex-col items-center">
             <i class="fa-solid fa-crown text-4xl text-accent mb-4"></i>
-            <h2 class="text-white font-bold text-xl uppercase tracking-widest">Ultimate V39</h2>
+            <h2 class="text-white font-bold text-xl uppercase tracking-widest">Ultimate V40</h2>
             <p class="text-slate-500 text-xs mt-1">Code PIN requis</p>
             <p id="login-error" class="text-red-500 text-xs font-bold mt-2">Code Incorrect</p>
         </div>
@@ -141,8 +136,8 @@
             <label class="block text-xs text-slate-400 mb-1">Type d'application</label>
             <select id="app-select" onchange="prefillApp()" class="w-full bg-slate-950 border border-slate-700 rounded p-3 text-white mb-3 outline-none focus:border-accent">
                 <option value="custom">-- Choisir --</option>
-                <option value="cam_action|Caméra (Interne)|cam_action|fa-solid fa-camera|#ffffff">Appareil Photo</option>
-                <option value="calc_action|Calculatrice (Interne)|calc_action|fa-solid fa-calculator|#fbbf24">Calculatrice</option>
+                <option value="cam_action|Caméra (Interne)|action:camera|fa-solid fa-camera|#ffffff">Appareil Photo (Direct)</option>
+                <option value="calc_action|Calculatrice (Interne)|action:calc|fa-solid fa-calculator|#fbbf24">Calculatrice (Interne)</option>
                 <option value="spotify|Spotify|spotify:|fa-brands fa-spotify|#1DB954">Spotify</option>
                 <option value="deezer|Deezer|deezer:|fa-brands fa-deezer|#a255ff">Deezer</option>
                 <option value="waze|Waze|https://waze.com/ul|fa-brands fa-waze|#3b82f6">Waze</option>
@@ -164,7 +159,7 @@
     </div>
 
     <nav class="glass-panel sticky top-0 z-50 border-b border-slate-700/50 pt-safe-top h-16 flex-none flex justify-between items-center px-4">
-        <div class="flex items-center gap-2 text-slate-500 z-10 w-20"><i class="fa-solid fa-bolt text-accent"></i> <span class="text-[10px] font-bold uppercase tracking-wider">V39</span></div>
+        <div class="flex items-center gap-2 text-slate-500 z-10 w-20"><i class="fa-solid fa-bolt text-accent"></i> <span class="text-[10px] font-bold uppercase tracking-wider">V40</span></div>
         <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center gap-3"><div class="text-3xl font-black text-white digital-clock font-mono" id="clock-display">--:--</div></div>
         <div class="flex items-center justify-end gap-3 z-10 w-auto">
             <div id="top-weather" class="flex items-center gap-2 text-xs font-bold text-slate-300"><span class="text-[9px] opacity-50">GPS?</span></div>
@@ -237,7 +232,7 @@
                         <div class="flex justify-between items-center w-full px-1 mb-1"><span class="text-[10px] font-bold text-slate-400">GPS</span><span id="gps-status" class="text-[8px] text-slate-500">OFF</span></div>
                         <label class="relative inline-flex items-center cursor-pointer scale-90"><input type="checkbox" id="gps-toggle" class="sr-only peer" onchange="toggleGPSMode()"><div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:bg-accent after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div></label>
                     </div>
-                    <button id="btn-timer" onclick="toggleTimer()" class="flex-grow flex items-center justify-center gap-3 rounded-lg font-black text-lg transition-all bg-accent text-slate-900 hover:bg-white shadow-md active:scale-95"><i class="fa-solid fa-play"></i> <span id="timer-display">00:00:00</span></button>
+                    <button id="btn-timer" onclick="toggleTimer()" class="flex-grow flex items-center justify-center gap-3 rounded-lg font-black text-lg transition-all bg-accent text-slate-900 active:scale-95 shadow-md"><i class="fa-solid fa-play"></i> <span id="timer-display">00:00:00</span></button>
                 </div>
                 <div class="space-y-2 bg-slate-800/40 p-2 rounded-lg border border-white/5">
                     <input type="text" id="input-title" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-white focus:border-accent outline-none text-xs" placeholder="Nom du trajet (ex: Balade)">
@@ -572,6 +567,7 @@
             if(!isTimerRunning) {
                 isTimerRunning=true; timerSeconds=0; currentTripDist=0; currentMaxSpeed=0; trackPoints=[]; 
                 polyline.setLatLngs([]); if(historyPolyline) historyPolyline.setLatLngs([]);
+                // REMOVED hover:bg-white which caused the button to stay white
                 btn.classList.replace('bg-accent','bg-red-500'); btn.classList.replace('text-slate-900','text-white');
                 rec.classList.replace('bg-slate-600', 'bg-red-500'); rec.classList.add('animate-pulse');
                 if(!document.getElementById('gps-toggle').checked) { document.getElementById('gps-toggle').checked=true; toggleGPSMode(); }
@@ -737,29 +733,34 @@
             document.getElementById('disp-trip-b').innerText = (state.tripB || 0).toFixed(1);
             document.getElementById('battery-max-range').value = state.batteryMax || 40;
             
-            // --- BATTERY COLORS & ALERTS ---
+            // --- BATTERY COLORS & ALERTS & HUD ---
             const battVal = state.batteryCurrent || 0;
             const battEl = document.getElementById('batt-range-dash');
             const battIcon = document.getElementById('batt-icon');
             const hudRange = document.getElementById('hud-range');
             
             battEl.innerText = battVal.toFixed(1);
-            hudRange.innerText = battVal.toFixed(1);
+            if(hudRange) hudRange.innerText = battVal.toFixed(1);
 
-            // COLOR LOGIC
+            // COLOR LOGIC (SAME FOR DASH AND HUD)
+            let colorClass = "text-accent"; // Default Green
+            let iconClass = "text-accent"; 
+            
             if(battVal <= 10) {
                 // RED CRITICAL
-                battEl.className = "text-2xl font-bold text-red-500 font-mono leading-none animate-pulse";
-                battIcon.className = "fa-solid fa-battery-empty mr-1 text-red-500 animate-pulse";
+                colorClass = "text-red-500 animate-pulse";
+                iconClass = "text-red-500 animate-pulse";
             } else if(battVal <= (state.batteryMax / 2)) {
                 // ORANGE WARNING
-                battEl.className = "text-2xl font-bold text-warning font-mono leading-none";
-                battIcon.className = "fa-solid fa-battery-quarter mr-1 text-warning";
-            } else {
-                // GREEN OK
-                battEl.className = "text-2xl font-bold text-accent font-mono leading-none";
-                battIcon.className = "fa-solid fa-battery-half mr-1 text-accent";
+                colorClass = "text-warning";
+                iconClass = "text-warning";
             }
+
+            // Apply classes
+            battEl.className = `text-2xl font-bold font-mono leading-none ${colorClass}`;
+            battIcon.className = `fa-solid fa-battery-half mr-1 ${iconClass}`;
+            // Apply logic to HUD too (keep base styling)
+            if(hudRange) hudRange.className = `text-2xl font-bold font-mono ${colorClass}`;
 
             // POPUP LOGIC (<20km)
             if(battVal < 20 && !state.lowBatteryWarned && battVal > 0) {
