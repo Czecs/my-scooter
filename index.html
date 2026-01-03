@@ -11,7 +11,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2641/2641271.png">
     
-    <title>ScooterMaster V44</title>
+    <title>ScooterMaster V45</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -38,23 +38,14 @@
         
         /* LAYERS */
         #login-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.98); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(10px); transition: opacity 0.5s; }
-        
-        #calc-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.95); z-index: 9000; display: none !important; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        #calc-overlay.flex { display: flex !important; }
-
         #app-modal { position: fixed; inset: 0; z-index: 9500; display: none; backdrop-filter: blur(5px); background: rgba(15, 23, 42, 0.9); justify-content: center; align-items: center; }
         #app-modal.flex { display: flex; }
-
         #battery-alert-modal { position: fixed; inset: 0; z-index: 9600; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
 
         .pin-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid #334155; transition: all 0.2s; }
         .pin-dot.filled { background: var(--accent-color); border-color: var(--accent-color); box-shadow: 0 0 10px var(--accent-color); }
         .numpad-btn { width: 60px; height: 60px; border-radius: 50%; border: 1px solid #334155; color: white; font-size: 24px; display: flex; items-center; justify-content: center; transition: all 0.1s; background: rgba(30, 41, 59, 0.5); }
         .numpad-btn:active { background: var(--accent-color); color: #0f172a; border-color: var(--accent-color); transform: scale(0.95); }
-        
-        .calc-btn { width: 100%; height: 50px; border-radius: 12px; border: 1px solid #334155; font-size: 20px; font-weight: bold; background: rgba(30, 41, 59, 0.6); color: white; }
-        .calc-btn:active { background: var(--accent-color); color: #0f172a; }
-        
         #login-error { transition: opacity 0.3s; opacity: 0; }
 
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
@@ -88,7 +79,7 @@
     <div id="login-overlay">
         <div class="mb-8 flex flex-col items-center">
             <i class="fa-solid fa-crown text-4xl text-accent mb-4"></i>
-            <h2 class="text-white font-bold text-xl uppercase tracking-widest">Ultimate V44</h2>
+            <h2 class="text-white font-bold text-xl uppercase tracking-widest">Ultimate V45</h2>
             <p class="text-slate-500 text-xs mt-1">Code PIN requis</p>
             <p id="login-error" class="text-red-500 text-xs font-bold mt-2">Code Incorrect</p>
         </div>
@@ -101,54 +92,38 @@
         </div>
     </div>
 
-    <div id="calc-overlay">
-        <div class="glass-panel p-4 rounded-2xl w-full max-w-xs border border-slate-600">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-white font-bold text-sm"><i class="fa-solid fa-calculator text-accent mr-2"></i>Calculatrice</h3>
-                <button onclick="closeCalc()" class="text-red-400"><i class="fa-solid fa-xmark text-xl"></i></button>
-            </div>
-            <div class="bg-slate-900 border border-slate-700 rounded-lg p-3 mb-4 text-right text-2xl font-mono text-white h-12 overflow-hidden" id="calc-display">0</div>
-            <div class="grid grid-cols-4 gap-2">
-                <button class="calc-btn text-red-400" onclick="calcAction('C')">C</button>
-                <button class="calc-btn" onclick="calcAction('(')">(</button>
-                <button class="calc-btn" onclick="calcAction(')')">)</button>
-                <button class="calc-btn text-accent" onclick="calcAction('/')">÷</button>
-                <button class="calc-btn" onclick="calcAction('7')">7</button>
-                <button class="calc-btn" onclick="calcAction('8')">8</button>
-                <button class="calc-btn" onclick="calcAction('9')">9</button>
-                <button class="calc-btn text-accent" onclick="calcAction('*')">×</button>
-                <button class="calc-btn" onclick="calcAction('4')">4</button>
-                <button class="calc-btn" onclick="calcAction('5')">5</button>
-                <button class="calc-btn" onclick="calcAction('6')">6</button>
-                <button class="calc-btn text-accent" onclick="calcAction('-')">-</button>
-                <button class="calc-btn" onclick="calcAction('1')">1</button>
-                <button class="calc-btn" onclick="calcAction('2')">2</button>
-                <button class="calc-btn" onclick="calcAction('3')">3</button>
-                <button class="calc-btn text-accent" onclick="calcAction('+')">+</button>
-                <button class="calc-btn" onclick="calcAction('0')">0</button>
-                <button class="calc-btn" onclick="calcAction('.')">.</button>
-                <button class="calc-btn text-slate-400" onclick="calcAction('back')">⌫</button>
-                <button class="calc-btn bg-accent text-slate-900 border-accent" onclick="calcAction('=')">=</button>
-            </div>
-        </div>
-    </div>
-
     <div id="app-modal">
         <div class="glass-panel w-full max-w-sm p-5 rounded-2xl border border-slate-600 shadow-2xl relative">
             <h3 class="text-white font-bold text-lg mb-4 text-center">Ajouter un raccourci</h3>
-            <label class="block text-xs text-slate-400 mb-1">Type d'application</label>
+            <label class="block text-xs text-slate-400 mb-1">Application</label>
             <select id="app-select" onchange="prefillApp()" class="w-full bg-slate-950 border border-slate-700 rounded p-3 text-white mb-3 outline-none focus:border-accent">
-                <option value="custom">-- Choisir --</option>
-                <option value="Calculatrice|sys_calc|fa-solid fa-calculator|#fbbf24">Calculatrice (Interne)</option>
-                <option value="Spotify|spotify:|fa-brands fa-spotify|#1DB954">Spotify</option>
-                <option value="Deezer|deezer:|fa-brands fa-deezer|#a255ff">Deezer</option>
-                <option value="Waze|https://waze.com/ul|fa-brands fa-waze|#3b82f6">Waze</option>
-                <option value="Google Maps|https://maps.google.com|fa-solid fa-map-location-dot|#10b981">Google Maps</option>
-                <option value="Téléphone|tel:|fa-solid fa-phone|#ffffff">Téléphone</option>
+                <option value="custom">-- Choisir dans la liste --</option>
+                <optgroup label="Navigation">
+                    <option value="Waze|https://waze.com/ul|fa-brands fa-waze|#3b82f6">Waze</option>
+                    <option value="Google Maps|https://maps.google.com|fa-solid fa-map-location-dot|#10b981">Google Maps</option>
+                </optgroup>
+                <optgroup label="Musique">
+                    <option value="Spotify|spotify:|fa-brands fa-spotify|#1DB954">Spotify</option>
+                    <option value="Deezer|deezer:|fa-brands fa-deezer|#a255ff">Deezer</option>
+                    <option value="YouTube Music|https://music.youtube.com|fa-brands fa-youtube|#ef4444">YouTube Music</option>
+                </optgroup>
+                <optgroup label="Communication">
+                    <option value="WhatsApp|whatsapp://|fa-brands fa-whatsapp|#25D366">WhatsApp</option>
+                    <option value="Messenger|fb-messenger://|fa-brands fa-facebook-messenger|#0084FF">Messenger</option>
+                    <option value="Telegram|tg://|fa-brands fa-telegram|#0088cc">Telegram</option>
+                    <option value="Téléphone|tel:|fa-solid fa-phone|#ffffff">Téléphone</option>
+                    <option value="Gmail|googlegmail://|fa-solid fa-envelope|#EA4335">Gmail</option>
+                </optgroup>
+                <optgroup label="Réseaux">
+                    <option value="Facebook|fb://|fa-brands fa-facebook|#1877F2">Facebook</option>
+                    <option value="Instagram|instagram://|fa-brands fa-instagram|#E4405F">Instagram</option>
+                    <option value="TikTok|tiktok://|fa-brands fa-tiktok|#ffffff">TikTok</option>
+                    <option value="Snapchat|snapchat://|fa-brands fa-snapchat|#FFFC00">Snapchat</option>
+                </optgroup>
             </select>
             <label class="block text-xs text-slate-400 mb-1">Nom</label>
             <input type="text" id="app-name" class="w-full bg-slate-800 border border-slate-600 rounded p-2 text-white mb-3 outline-none text-sm">
-            <label class="block text-xs text-slate-400 mb-1">Lien / ID</label>
+            <label class="block text-xs text-slate-400 mb-1">Lien / URI</label>
             <input type="text" id="app-url" class="w-full bg-slate-800 border border-slate-600 rounded p-2 text-white mb-3 outline-none text-xs font-mono">
             <input type="hidden" id="app-icon" value="fa-solid fa-cube">
             <input type="hidden" id="app-color" value="#ffffff">
@@ -161,7 +136,7 @@
     </div>
 
     <nav class="glass-panel sticky top-0 z-50 border-b border-slate-700/50 pt-safe-top h-16 flex-none flex justify-between items-center px-4">
-        <div class="flex items-center gap-2 text-slate-500 z-10 w-20"><i class="fa-solid fa-bolt text-accent"></i> <span class="text-[10px] font-bold uppercase tracking-wider">V44</span></div>
+        <div class="flex items-center gap-2 text-slate-500 z-10 w-20"><i class="fa-solid fa-bolt text-accent"></i> <span class="text-[10px] font-bold uppercase tracking-wider">V45</span></div>
         <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center gap-3"><div class="text-3xl font-black text-white digital-clock font-mono" id="clock-display">--:--</div></div>
         <div class="flex items-center justify-end gap-3 z-10 w-auto">
             <div id="top-weather" class="flex items-center gap-2 text-xs font-bold text-slate-300"><span class="text-[9px] opacity-50">GPS?</span></div>
@@ -402,6 +377,14 @@
                 if(d) {
                     const loaded = JSON.parse(d);
                     state = { ...state, ...loaded };
+                    
+                    // --- CLEANUP CORRUPTED SHORTCUTS ---
+                    if (state.shortcutsMain) {
+                        state.shortcutsMain = state.shortcutsMain.map(s => 
+                            (s && (s.url.includes('camera') || s.url.includes('cam_'))) ? null : s
+                        );
+                    }
+                    
                     if(!state.maintenance || typeof state.maintenance !== 'object') {
                         state.maintenance = {
                             general: { last: loaded.maintenanceKm || 0, interval: loaded.maintInterval || 500 },
@@ -451,16 +434,14 @@
             document.getElementById('calc-display').innerText = calcExp || "0";
         }
 
-        // --- APP LAUNCHER ENGINE (FIXED) ---
+        // --- APP LAUNCHER ENGINE (SIMPLE & ROBUST) ---
         function launchApp(url) {
             if(!url) return;
-            // CHECK INTERNAL ID
-            if(url === 'sys_calc' || url.includes('calc')) { openCalc(); return; }
-            
-            // STANDARD OPEN
+            // Standard Web Open
             if(url.startsWith('http')) { 
                 window.open(url, '_blank'); 
             } else { 
+                // URI schemes (spotify:, tel:, etc)
                 window.location.href = url; 
             }
         }
@@ -496,7 +477,7 @@
             if(confirm("Ouvrir Waze ?")) window.open(`https://waze.com/ul?q=${encodeURIComponent(addr)}&navigate=yes`, '_blank');
         }
 
-        // --- GPS CORE ---
+        // --- GPS CORE & AUTO-INIT ---
         let map, polyline, marker, watchId, isTimerRunning=false, timerInterval, timerSeconds=0, currentTripDist=0, trackPoints=[], currentMaxSpeed=0;
         let mapTileLayer, isDarkMap = true, historyPolyline = null;
         let wakeLock=null; async function requestWakeLock(){ if('wakeLock' in navigator) try{ wakeLock=await navigator.wakeLock.request('screen'); document.getElementById('wake-icon').classList.add('wake-active'); }catch(e){} }
