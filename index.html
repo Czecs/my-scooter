@@ -11,7 +11,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2641/2641271.png">
     
-    <title>ScooterMaster V43</title>
+    <title>ScooterMaster V44</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -36,10 +36,15 @@
         .nav-arrow { width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 20px solid var(--accent-color); filter: drop-shadow(0 0 5px rgba(0,0,0,0.5)); transition: transform 0.3s ease; }
         .nav-arrow-container { display: flex; justify-content: center; align-items: center; width: 40px; height: 40px; background: rgba(15, 23, 42, 0.5); border-radius: 50%; border: 2px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
         
+        /* LAYERS */
         #login-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.98); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(10px); transition: opacity 0.5s; }
-        #calc-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.98); z-index: 9000; display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        
+        #calc-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.95); z-index: 9000; display: none !important; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        #calc-overlay.flex { display: flex !important; }
+
         #app-modal { position: fixed; inset: 0; z-index: 9500; display: none; backdrop-filter: blur(5px); background: rgba(15, 23, 42, 0.9); justify-content: center; align-items: center; }
         #app-modal.flex { display: flex; }
+
         #battery-alert-modal { position: fixed; inset: 0; z-index: 9600; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
 
         .pin-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid #334155; transition: all 0.2s; }
@@ -49,6 +54,7 @@
         
         .calc-btn { width: 100%; height: 50px; border-radius: 12px; border: 1px solid #334155; font-size: 20px; font-weight: bold; background: rgba(30, 41, 59, 0.6); color: white; }
         .calc-btn:active { background: var(--accent-color); color: #0f172a; }
+        
         #login-error { transition: opacity 0.3s; opacity: 0; }
 
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
@@ -82,7 +88,7 @@
     <div id="login-overlay">
         <div class="mb-8 flex flex-col items-center">
             <i class="fa-solid fa-crown text-4xl text-accent mb-4"></i>
-            <h2 class="text-white font-bold text-xl uppercase tracking-widest">Ultimate V43</h2>
+            <h2 class="text-white font-bold text-xl uppercase tracking-widest">Ultimate V44</h2>
             <p class="text-slate-500 text-xs mt-1">Code PIN requis</p>
             <p id="login-error" class="text-red-500 text-xs font-bold mt-2">Code Incorrect</p>
         </div>
@@ -133,17 +139,17 @@
             <label class="block text-xs text-slate-400 mb-1">Type d'application</label>
             <select id="app-select" onchange="prefillApp()" class="w-full bg-slate-950 border border-slate-700 rounded p-3 text-white mb-3 outline-none focus:border-accent">
                 <option value="custom">-- Choisir --</option>
-                <option value="sys_calc|Calculatrice|sys_calc|fa-solid fa-calculator|#fbbf24">Calculatrice (Interne)</option>
-                <option value="spotify|Spotify|spotify:|fa-brands fa-spotify|#1DB954">Spotify</option>
-                <option value="deezer|Deezer|deezer:|fa-brands fa-deezer|#a255ff">Deezer</option>
-                <option value="waze|Waze|https://waze.com/ul|fa-brands fa-waze|#3b82f6">Waze</option>
-                <option value="maps|Maps|https://maps.google.com|fa-solid fa-map-location-dot|#10b981">Google Maps</option>
-                <option value="tel|Téléphone|tel:|fa-solid fa-phone|#ffffff">Téléphone</option>
+                <option value="Calculatrice|sys_calc|fa-solid fa-calculator|#fbbf24">Calculatrice (Interne)</option>
+                <option value="Spotify|spotify:|fa-brands fa-spotify|#1DB954">Spotify</option>
+                <option value="Deezer|deezer:|fa-brands fa-deezer|#a255ff">Deezer</option>
+                <option value="Waze|https://waze.com/ul|fa-brands fa-waze|#3b82f6">Waze</option>
+                <option value="Google Maps|https://maps.google.com|fa-solid fa-map-location-dot|#10b981">Google Maps</option>
+                <option value="Téléphone|tel:|fa-solid fa-phone|#ffffff">Téléphone</option>
             </select>
             <label class="block text-xs text-slate-400 mb-1">Nom</label>
             <input type="text" id="app-name" class="w-full bg-slate-800 border border-slate-600 rounded p-2 text-white mb-3 outline-none text-sm">
             <label class="block text-xs text-slate-400 mb-1">Lien / ID</label>
-            <input type="text" id="app-url" class="w-full bg-slate-800 border border-slate-600 rounded p-2 text-white mb-3 outline-none text-xs font-mono" disabled>
+            <input type="text" id="app-url" class="w-full bg-slate-800 border border-slate-600 rounded p-2 text-white mb-3 outline-none text-xs font-mono">
             <input type="hidden" id="app-icon" value="fa-solid fa-cube">
             <input type="hidden" id="app-color" value="#ffffff">
             <div class="grid grid-cols-2 gap-3 mt-4">
@@ -155,7 +161,7 @@
     </div>
 
     <nav class="glass-panel sticky top-0 z-50 border-b border-slate-700/50 pt-safe-top h-16 flex-none flex justify-between items-center px-4">
-        <div class="flex items-center gap-2 text-slate-500 z-10 w-20"><i class="fa-solid fa-bolt text-accent"></i> <span class="text-[10px] font-bold uppercase tracking-wider">V43</span></div>
+        <div class="flex items-center gap-2 text-slate-500 z-10 w-20"><i class="fa-solid fa-bolt text-accent"></i> <span class="text-[10px] font-bold uppercase tracking-wider">V44</span></div>
         <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center gap-3"><div class="text-3xl font-black text-white digital-clock font-mono" id="clock-display">--:--</div></div>
         <div class="flex items-center justify-end gap-3 z-10 w-auto">
             <div id="top-weather" class="flex items-center gap-2 text-xs font-bold text-slate-300"><span class="text-[9px] opacity-50">GPS?</span></div>
@@ -386,7 +392,7 @@
         // --- 2. DATA & STATE ---
         let state = { 
             odo: 0, tripA: 0, tripB: 0, maintenance: null, logs: [], addresses: {home:'', work:''}, eco: {car: 0.20, scooter: 0.05}, 
-            shortcutsMain: [null,null,null,null], shortcutsMini: [null,null,null,null],
+            shortcutsMain: [null,null,null,null], 
             themeColor: '#10b981', batteryMax: 40, batteryCurrent: 40, lowBatteryWarned: false
         };
         
@@ -396,14 +402,6 @@
                 if(d) {
                     const loaded = JSON.parse(d);
                     state = { ...state, ...loaded };
-                    
-                    // --- CLEANUP CORRUPTED SHORTCUTS ---
-                    if (state.shortcutsMain) {
-                        state.shortcutsMain = state.shortcutsMain.map(s => 
-                            (s && (s.url.includes('camera') || s.url.includes('cam_'))) ? null : s
-                        );
-                    }
-                    
                     if(!state.maintenance || typeof state.maintenance !== 'object') {
                         state.maintenance = {
                             general: { last: loaded.maintenanceKm || 0, interval: loaded.maintInterval || 500 },
@@ -453,17 +451,16 @@
             document.getElementById('calc-display').innerText = calcExp || "0";
         }
 
-        // --- APP LAUNCHER ENGINE (SIMPLE & ROBUST) ---
+        // --- APP LAUNCHER ENGINE (FIXED) ---
         function launchApp(url) {
             if(!url) return;
-            // Internal Calc Check
+            // CHECK INTERNAL ID
             if(url === 'sys_calc' || url.includes('calc')) { openCalc(); return; }
             
-            // Standard Web Open
+            // STANDARD OPEN
             if(url.startsWith('http')) { 
                 window.open(url, '_blank'); 
             } else { 
-                // URI schemes (spotify:, tel:, etc)
                 window.location.href = url; 
             }
         }
@@ -499,7 +496,7 @@
             if(confirm("Ouvrir Waze ?")) window.open(`https://waze.com/ul?q=${encodeURIComponent(addr)}&navigate=yes`, '_blank');
         }
 
-        // --- GPS CORE & AUTO-INIT ---
+        // --- GPS CORE ---
         let map, polyline, marker, watchId, isTimerRunning=false, timerInterval, timerSeconds=0, currentTripDist=0, trackPoints=[], currentMaxSpeed=0;
         let mapTileLayer, isDarkMap = true, historyPolyline = null;
         let wakeLock=null; async function requestWakeLock(){ if('wakeLock' in navigator) try{ wakeLock=await navigator.wakeLock.request('screen'); document.getElementById('wake-icon').classList.add('wake-active'); }catch(e){} }
@@ -516,11 +513,8 @@
             
             if(navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(p => {
-                    const lat = p.coords.latitude;
-                    const lon = p.coords.longitude;
-                    map.setView([lat, lon], 16);
-                    marker.setLatLng([lat, lon]);
-                    fetchWeather(lat, lon); 
+                    const lat = p.coords.latitude; const lon = p.coords.longitude;
+                    map.setView([lat, lon], 16); marker.setLatLng([lat, lon]); fetchWeather(lat, lon);
                 });
             }
         }
@@ -548,7 +542,6 @@
                     marker.setLatLng([lat,lon]);
                     const arrow = document.getElementById('gps-arrow'); if(arrow) arrow.style.transform = `rotate(${pos.coords.heading||0}deg)`;
                     map.setView([lat,lon]);
-                    
                     if(Math.random() < 0.05) fetchWeather(lat, lon); 
 
                     if(isTimerRunning) {
@@ -561,10 +554,7 @@
                             const d = 6371 * 2 * Math.atan2(Math.sqrt(Math.sin((lat-last.lat)*Math.PI/360)**2 + Math.cos(last.lat*Math.PI/180)*Math.cos(lat*Math.PI/180)*Math.sin((lon-last.lon)*Math.PI/360)**2), Math.sqrt(1-Math.sin((lat-last.lat)*Math.PI/360)**2 - Math.cos(last.lat*Math.PI/180)*Math.cos(lat*Math.PI/180)*Math.sin((lon-last.lon)*Math.PI/360)**2));
                             if(d > 0.002) { 
                                 currentTripDist += d; 
-                                state.batteryCurrent -= d;
-                                if(state.batteryCurrent < 0) state.batteryCurrent = 0;
-                                saveData();
-                                updateUI();
+                                state.batteryCurrent -= d; if(state.batteryCurrent < 0) state.batteryCurrent = 0; saveData(); updateUI();
                                 document.getElementById('dash-dist').innerText = currentTripDist.toFixed(2); 
                                 document.getElementById('hud-dist').innerText = currentTripDist.toFixed(1); 
                                 document.getElementById('input-dist').value = currentTripDist.toFixed(2); 
@@ -596,8 +586,7 @@
             if(isTimerRunning) toggleTimer(); 
             const dist = parseFloat(document.getElementById('input-dist').value); if(!dist || dist<=0) return alert("0 km ?"); 
             state.odo += dist; state.tripA += dist; state.tripB += dist;
-            state.batteryCurrent = (state.batteryCurrent || 40) - dist;
-            if(state.batteryCurrent < 0) state.batteryCurrent = 0;
+            state.batteryCurrent = (state.batteryCurrent || 40) - dist; if(state.batteryCurrent < 0) state.batteryCurrent = 0;
             state.logs.unshift({id: Date.now(), title: document.getElementById('input-title').value||"Trajet", date: document.getElementById('input-date').value, dist: dist.toFixed(1), max: currentMaxSpeed, track: [...trackPoints]}); 
             saveData(); updateUI(); 
             document.getElementById('input-dist').value = ""; document.getElementById('timer-display').innerText="00:00:00"; document.getElementById('hud-dist').innerText="0.0";
@@ -627,7 +616,7 @@
         function resetMultiMaint(key) { if(confirm('Reset '+key+'?')) { state.maintenance[key].last = state.odo; saveData(); updateUI(); } }
         function setMaintInterval(key) { const v=prompt("Intervalle:"); if(v&&!isNaN(v)){ state.maintenance[key].interval=parseFloat(v); saveData(); updateUI(); } }
 
-        // --- CHART (DIST / ALT) ---
+        // --- CHART ---
         let chartInstance = null; let chartMode = 'dist'; 
         function setChartMode(m) { chartMode = m; document.getElementById('btn-chart-dist').className = m==='dist' ? "text-[9px] px-2 py-0.5 rounded text-slate-300 bg-slate-600" : "text-[9px] px-2 py-0.5 rounded text-slate-500"; document.getElementById('btn-chart-alt').className = m==='alt' ? "text-[9px] px-2 py-0.5 rounded text-slate-300 bg-slate-600" : "text-[9px] px-2 py-0.5 rounded text-slate-500"; renderChart(); }
         function renderChart() {
@@ -647,25 +636,30 @@
             chartInstance = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ label: chartMode, data: data, borderColor: color, backgroundColor: color+'33', borderWidth: 2, tension: 0.4, fill: true, pointRadius: chartMode==='alt'?0:3 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#94a3b8', font: {size:8} } }, x: { display: true, grid: { display: false }, ticks: { color: '#94a3b8', font: {size:8} } } } } });
         }
 
-        // --- SHORTCUTS ENGINE (SIMPLE & ROBUST) ---
+        // --- SHORTCUTS ENGINE (CLEAN & ROBUST) ---
         let editTarget = null; let currentSlotIndex = -1;
         function renderShortcuts(type) { 
             const grid = document.getElementById(`shortcut-grid-${type}`); if(!grid) return; grid.innerHTML = '';
             const list = type === 'main' ? state.shortcutsMain : []; // IGNORE MINI
             const isEditing = (editTarget === type);
-            // H-20 = Plus grand et lisible
             const heightClass = 'h-20'; 
 
             list.forEach((app, index) => {
                 const btn = document.createElement('div');
                 if (app) {
+                    // FIX: Ensure Name/Icon/Color are populated even if mis-saved
+                    let displayIcon = app.icon || "fa-solid fa-cube";
+                    let displayName = app.name || "App";
+                    let displayColor = app.color || "#ffffff";
+
+                    // LOGIC EXECUTION
                     let action = `launchApp('${app.url}')`;
                     if(isEditing) action = `openAppModal('${type}', ${index})`;
 
                     btn.className = `relative ${heightClass} rounded-xl flex flex-col items-center justify-center gap-1 transition active:scale-95 cursor-pointer overflow-hidden border ${isEditing ? 'border-yellow-500 bg-yellow-500/10 animate-pulse' : 'border-slate-700 bg-slate-800/50 hover:bg-slate-700'}`;
                     btn.setAttribute('onclick', action);
-                    btn.style.borderColor = isEditing ? '#eab308' : (app.color + '40');
-                    btn.innerHTML = `<i class="${app.icon} text-2xl mb-1" style="color: ${app.color}"></i><span class="text-[9px] font-bold text-slate-300 truncate w-full text-center px-1">${app.name}</span>${isEditing ? '<div class="absolute top-0 right-0 text-[8px] text-yellow-500 p-1"><i class="fa-solid fa-pencil"></i></div>' : ''}`;
+                    btn.style.borderColor = isEditing ? '#eab308' : (displayColor + '40');
+                    btn.innerHTML = `<i class="${displayIcon} text-2xl mb-1" style="color: ${displayColor}"></i><span class="text-[9px] font-bold text-slate-300 truncate w-full text-center px-1">${displayName}</span>${isEditing ? '<div class="absolute top-0 right-0 text-[8px] text-yellow-500 p-1"><i class="fa-solid fa-pencil"></i></div>' : ''}`;
                 } else {
                     btn.className = `${heightClass} rounded-xl border border-dashed border-slate-700 flex items-center justify-center text-slate-600 hover:text-accent hover:border-accent transition cursor-pointer active:scale-95 bg-slate-900/30`;
                     btn.onclick = () => openAppModal(type, index);
@@ -684,7 +678,9 @@
             modal.classList.add('flex'); modal.classList.remove('hidden');
         }
         function closeAppModal() { document.getElementById('app-modal').classList.add('hidden'); document.getElementById('app-modal').classList.remove('flex'); }
+        // FIX: Ensure prefill uses correct 4-part split
         function prefillApp() { const val = document.getElementById('app-select').value; if (val === 'custom') return; const [name, url, icon, color] = val.split('|'); document.getElementById('app-name').value = name; document.getElementById('app-url').value = url; document.getElementById('app-icon').value = icon; document.getElementById('app-color').value = color; }
+        
         function saveShortcut() {
             const name = document.getElementById('app-name').value; const url = document.getElementById('app-url').value;
             const icon = document.getElementById('app-icon').value; const color = document.getElementById('app-color').value;
