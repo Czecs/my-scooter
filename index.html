@@ -109,9 +109,21 @@
     </div>
 
     <nav class="glass-panel sticky top-0 z-50 border-b border-slate-700/50 pt-safe-top h-16 flex-none flex justify-between items-center px-4">
-        <div class="flex items-center gap-2 text-slate-500 z-10"><i class="fa-solid fa-cloud-bolt text-accent text-xs"></i> <span class="text-[10px] font-bold uppercase">Ultimate V24</span></div>
-        <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl font-black text-white digital-clock font-mono" id="clock-display">--:--</div>
-        <div class="flex items-center gap-3 z-10"><i id="wake-icon" class="fa-solid fa-lightbulb text-slate-600 text-sm transition-colors duration-500"></i></div>
+        <div class="flex items-center gap-2 text-slate-500 z-10 w-20">
+            <span class="text-[10px] font-bold uppercase tracking-wider">V24</span>
+        </div>
+        
+        <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center gap-3">
+             <div class="text-3xl font-black text-white digital-clock font-mono" id="clock-display">--:--</div>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 z-10 w-auto">
+            <div id="top-weather" class="flex items-center gap-2 text-xs font-bold text-slate-300">
+                <span class="text-[9px] opacity-50">GPS?</span>
+            </div>
+            <div class="h-4 w-[1px] bg-slate-700"></div>
+            <i id="wake-icon" class="fa-solid fa-lightbulb text-slate-600 text-sm transition-colors duration-500"></i>
+        </div>
     </nav>
 
     <main class="flex-grow relative w-full max-w-7xl mx-auto overflow-hidden">
@@ -119,27 +131,27 @@
         <div id="tab-dashboard" class="tab-content active p-3 gap-3">
             
             <div class="grid grid-cols-4 gap-2 flex-none h-18">
-                <div class="glass-panel rounded-xl p-1 flex flex-col items-center justify-center bg-blue-900/20 border border-blue-500/30">
-                    <div id="weather-content" class="text-center flex flex-col items-center">
-                        <i class="fa-solid fa-cloud text-slate-400 text-lg mb-1"></i>
-                        <span class="text-[10px] font-bold text-white">--°</span>
-                    </div>
+                
+                <div class="glass-panel rounded-xl p-1 flex flex-col items-center justify-center bg-slate-800/40">
+                    <span class="text-[8px] text-slate-500 uppercase font-bold">Total</span>
+                    <div class="font-mono font-bold text-white text-sm"><span id="disp-odo-total">0.0</span></div>
+                    <span class="text-[7px] text-slate-500">km</span>
                 </div>
 
                 <div class="glass-panel rounded-xl p-1 flex flex-col items-center justify-center relative">
-                    <span class="text-[8px] text-slate-500 uppercase font-bold">Trip A</span>
-                    <div class="font-mono font-bold text-white text-sm"><span id="disp-trip-a">0.0</span> <span class="text-[8px] font-normal text-slate-400">km</span></div>
+                    <span class="text-[8px] text-accent uppercase font-bold">Trip A</span>
+                    <div class="font-mono font-bold text-white text-sm"><span id="disp-trip-a">0.0</span></div>
                     <button onclick="resetTrip('A')" class="absolute top-1 right-1 text-[8px] text-slate-600 hover:text-red-400 p-1"><i class="fa-solid fa-rotate-right"></i></button>
                 </div>
 
                 <div class="glass-panel rounded-xl p-1 flex flex-col items-center justify-center relative">
-                    <span class="text-[8px] text-slate-500 uppercase font-bold">Trip B</span>
-                    <div class="font-mono font-bold text-white text-sm"><span id="disp-trip-b">0.0</span> <span class="text-[8px] font-normal text-slate-400">km</span></div>
+                    <span class="text-[8px] text-warning uppercase font-bold">Trip B</span>
+                    <div class="font-mono font-bold text-white text-sm"><span id="disp-trip-b">0.0</span></div>
                     <button onclick="resetTrip('B')" class="absolute top-1 right-1 text-[8px] text-slate-600 hover:text-red-400 p-1"><i class="fa-solid fa-rotate-right"></i></button>
                 </div>
 
                 <div class="glass-panel rounded-xl p-1 flex flex-col items-center justify-center bg-emerald-900/20 border border-emerald-500/30">
-                    <i class="fa-solid fa-piggy-bank text-emerald-400 text-lg mb-1"></i>
+                    <i class="fa-solid fa-piggy-bank text-emerald-400 text-sm mb-1"></i>
                     <div class="text-[10px] font-bold text-white"><span id="savings-display">0</span> €</div>
                 </div>
             </div>
@@ -294,7 +306,6 @@
         function changeUserPin() { const n = document.getElementById('new-pin-input').value; if(n.length===4 && confirm('Changer PIN?')) { localStorage.setItem('scooter_pin', n); savedPin=n; alert('OK'); document.getElementById('new-pin-input').value=""; } }
         
         // --- 2. DATA ---
-        // Ajout de "tripA" et "tripB"
         let state = { odo: 0, tripA: 0, tripB: 0, maintenanceKm: 0, maintInterval: 500, logs: [], addresses: {home:'', work:''}, eco: {car: 0.20, scooter: 0.05}, shortcuts: [null,null,null,null] };
         
         function loadData() { 
@@ -306,8 +317,9 @@
                     if(old) state = { ...state, ...JSON.parse(old) }; 
                 } 
                 if(!state.shortcuts || !Array.isArray(state.shortcuts)) state.shortcuts = [null,null,null,null];
-                if(typeof state.tripA === 'undefined') state.tripA = 0;
-                if(typeof state.tripB === 'undefined') state.tripB = 0;
+                // SECURITE TRIP: Force en nombre
+                if(isNaN(state.tripA)) state.tripA = 0;
+                if(isNaN(state.tripB)) state.tripB = 0;
                 updateUI(); 
             } catch(e){} 
         }
@@ -322,12 +334,9 @@
                 const rain = data.current.precipitation_probability;
                 let icon = rain > 50 ? '<i class="fa-solid fa-cloud-showers-heavy text-blue-400"></i>' : (rain > 20 ? '<i class="fa-solid fa-cloud-rain text-blue-300"></i>' : (temp > 20 ? '<i class="fa-solid fa-sun text-yellow-400"></i>' : '<i class="fa-solid fa-cloud text-slate-300"></i>'));
                 
-                // Version compacte pour la grille de 4
-                document.getElementById('weather-content').innerHTML = `
-                    <div class="text-xl mb-0 text-white">${icon}</div>
-                    <span class="text-[10px] font-bold text-white leading-none">${temp}°</span>
-                `;
-            } catch(e) { document.getElementById('weather-content').innerHTML = '<span class="text-[8px] text-red-400">Erreur</span>'; }
+                // Météo dans le TOP BAR
+                document.getElementById('top-weather').innerHTML = `${icon} <span class="text-white">${temp}°</span>`;
+            } catch(e) { document.getElementById('top-weather').innerHTML = '<span class="text-[9px] text-red-400">ERR</span>'; }
         }
 
         function saveEcoSettings() {
@@ -398,11 +407,11 @@
                             const d = 6371 * 2 * Math.atan2(Math.sqrt(Math.sin((lat-last.lat)*Math.PI/360)**2 + Math.cos(last.lat*Math.PI/180)*Math.cos(lat*Math.PI/180)*Math.sin((lon-last.lon)*Math.PI/360)**2), Math.sqrt(1-Math.sin((lat-last.lat)*Math.PI/360)**2 - Math.cos(last.lat*Math.PI/180)*Math.cos(lat*Math.PI/180)*Math.sin((lon-last.lon)*Math.PI/360)**2));
                             if(d > 0.002) { 
                                 currentTripDist += d; 
-                                // UPDATE DES TRIPS (A et B)
-                                state.tripA = (state.tripA || 0) + d;
-                                state.tripB = (state.tripB || 0) + d;
+                                // UPDATE DES TRIPS (A et B) EXACTEMENT COMME LE RESTE
+                                state.tripA += d;
+                                state.tripB += d;
                                 saveData();
-                                updateUI(); // Rafraichit l'affichage
+                                updateUI(); 
 
                                 document.getElementById('dash-dist').innerText = currentTripDist.toFixed(2); 
                                 document.getElementById('hud-dist').innerText = currentTripDist.toFixed(1); 
@@ -474,7 +483,6 @@
                 
                 if (app) {
                     let action = isEditMode ? `openAppModal(${index})` : `window.location.href='${app.url}'`;
-                    // Pour liens http, ouverture new tab. Pour URI (spotify:), comportement defaut.
                     if (!isEditMode && app.url.startsWith('http')) {
                         action = `window.open('${app.url}', '_blank')`;
                     }
@@ -579,7 +587,8 @@
         function updateUI() { 
             if(document.getElementById('odo-input')) document.getElementById('odo-input').value = state.odo.toFixed(1);
             
-            // TRIPS
+            // GRID LIGNE 1
+            document.getElementById('disp-odo-total').innerText = state.odo.toFixed(1);
             document.getElementById('disp-trip-a').innerText = (state.tripA || 0).toFixed(1);
             document.getElementById('disp-trip-b').innerText = (state.tripB || 0).toFixed(1);
 
