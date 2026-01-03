@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+a<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -12,7 +12,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2641/2641271.png">
     
-    <title>ScooterMaster V25 Ultimate</title>
+    <title>ScooterMaster V26 Ultimate</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -61,7 +61,7 @@
     <div id="login-overlay">
         <div class="mb-8 flex flex-col items-center">
             <i class="fa-solid fa-crown text-4xl text-accent mb-4"></i>
-            <h2 class="text-white font-bold text-xl uppercase tracking-widest">Ultimate V25</h2>
+            <h2 class="text-white font-bold text-xl uppercase tracking-widest">Ultimate V26</h2>
             <p class="text-slate-500 text-xs mt-1">Code PIN requis</p>
             <p id="login-error" class="text-red-500 text-xs font-bold mt-2">Code Incorrect</p>
         </div>
@@ -103,7 +103,7 @@
     </div>
 
     <nav class="glass-panel sticky top-0 z-50 border-b border-slate-700/50 pt-safe-top h-16 flex-none flex justify-between items-center px-4">
-        <div class="flex items-center gap-2 text-slate-500 z-10 w-20"><span class="text-[10px] font-bold uppercase tracking-wider">V25</span></div>
+        <div class="flex items-center gap-2 text-slate-500 z-10 w-20"><span class="text-[10px] font-bold uppercase tracking-wider">V26</span></div>
         <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center gap-3"><div class="text-3xl font-black text-white digital-clock font-mono" id="clock-display">--:--</div></div>
         <div class="flex items-center justify-end gap-3 z-10 w-auto">
             <div id="top-weather" class="flex items-center gap-2 text-xs font-bold text-slate-300"><span class="text-[9px] opacity-50">GPS?</span></div>
@@ -232,8 +232,7 @@
 
             <div class="glass-panel rounded-xl p-4 border border-slate-600 relative overflow-hidden flex-none">
                 <h3 class="text-white font-bold mb-4 text-xs uppercase"><i class="fa-solid fa-wrench text-warning mr-2"></i>Entretien</h3>
-                <div id="maintenance-container" class="space-y-4">
-                    </div>
+                <div id="maintenance-container" class="space-y-4"></div>
             </div>
 
             <div class="glass-panel rounded-xl p-4 border border-slate-600 flex-none">
@@ -287,7 +286,6 @@
         function changeUserPin() { const n = document.getElementById('new-pin-input').value; if(n.length===4 && confirm('Changer PIN?')) { localStorage.setItem('scooter_pin', n); savedPin=n; alert('OK'); document.getElementById('new-pin-input').value=""; } }
         
         // --- 2. DATA ---
-        // Ajout structure maintenance objet
         let state = { odo: 0, tripA: 0, tripB: 0, maintenance: null, logs: [], addresses: {home:'', work:''}, eco: {car: 0.20, scooter: 0.05}, shortcuts: [null,null,null,null] };
         
         function loadData() { 
@@ -296,7 +294,6 @@
                 if(d) {
                     const loaded = JSON.parse(d);
                     state = { ...state, ...loaded };
-                    // MIGRATION ENTRETIEN
                     if(!state.maintenance || typeof state.maintenance !== 'object') {
                         state.maintenance = {
                             general: { last: loaded.maintenanceKm || 0, interval: loaded.maintInterval || 500 },
@@ -349,18 +346,19 @@
         // --- 4. GPS CORE & MAP THEME ---
         let map, polyline, marker, watchId, isTimerRunning=false, timerInterval, timerSeconds=0, currentTripDist=0, trackPoints=[], currentMaxSpeed=0;
         let mapTileLayer, isDarkMap = true;
+        let historyPolyline = null; // Pour afficher un vieux trajet
+
         let wakeLock=null; async function requestWakeLock(){ if('wakeLock' in navigator) try{ wakeLock=await navigator.wakeLock.request('screen'); document.getElementById('wake-icon').classList.add('wake-active'); }catch(e){} }
         
         window.onload = function() { loadData(); document.getElementById('input-date').valueAsDate = new Date(); initMap(); requestWakeLock(); };
 
         function initMap() { 
             map = L.map('map', {zoomControl:false}).setView([48.85, 2.35], 16);
-            // Default Dark
             mapTileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {maxZoom: 20}).addTo(map);
-            
             const arrowIcon = L.divIcon({ className:'custom-div-icon', html:"<div class='nav-arrow-container'><div id='gps-arrow' class='nav-arrow'></div></div>", iconSize:[40,40], iconAnchor:[20,20] });
             marker = L.marker([0,0], {icon: arrowIcon}).addTo(map);
             polyline = L.polyline([], {color:'#10b981', weight:5}).addTo(map);
+            historyPolyline = L.polyline([], {color:'#06b6d4', weight:5, dashArray: '10, 10'}).addTo(map); // Cyan pour l'historique
         }
 
         function toggleMapTheme() {
@@ -369,14 +367,9 @@
                 ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' 
                 : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
             mapTileLayer.setUrl(url);
-            
             const btn = document.getElementById('map-theme-icon');
-            if(isDarkMap) {
-                btn.className = "fa-solid fa-sun text-yellow-400";
-                document.getElementById('map').classList.remove('brightness-125');
-            } else {
-                btn.className = "fa-solid fa-moon text-slate-300";
-            }
+            if(isDarkMap) { btn.className = "fa-solid fa-sun text-yellow-400"; document.getElementById('map').classList.remove('brightness-125'); } 
+            else { btn.className = "fa-solid fa-moon text-slate-300"; }
         }
 
         function centerMap() { if(!navigator.geolocation) return alert("Pas de GPS"); navigator.geolocation.getCurrentPosition(p=>{map.setView([p.coords.latitude, p.coords.longitude], 18);}); }
@@ -424,28 +417,75 @@
         function toggleTimer() {
             const btn = document.getElementById('btn-timer'); const rec = document.getElementById('rec-dot');
             if(!isTimerRunning) {
-                isTimerRunning=true; timerSeconds=0; currentTripDist=0; currentMaxSpeed=0; trackPoints=[]; polyline.setLatLngs([]);
+                // START
+                isTimerRunning=true; timerSeconds=0; currentTripDist=0; currentMaxSpeed=0; trackPoints=[]; 
+                polyline.setLatLngs([]); // Reset current live line
+                if(historyPolyline) historyPolyline.setLatLngs([]); // Reset history view if any
                 btn.classList.replace('bg-accent','bg-red-500'); btn.classList.replace('text-slate-900','text-white');
                 rec.classList.replace('bg-slate-600', 'bg-red-500'); rec.classList.add('animate-pulse');
                 if(!document.getElementById('gps-toggle').checked) { document.getElementById('gps-toggle').checked=true; toggleGPSMode(); }
                 timerInterval = setInterval(()=>{ timerSeconds++; const h=Math.floor(timerSeconds/3600), m=Math.floor((timerSeconds%3600)/60), s=timerSeconds%60; const txt=`${h<10?'0'+h:h}:${m<10?'0'+m:m}:${s<10?'0'+s:s}`; document.getElementById('timer-display').innerText=txt; document.getElementById('hud-timer').innerText=txt; }, 1000);
             } else { 
+                // STOP
                 isTimerRunning=false; clearInterval(timerInterval); 
                 btn.classList.replace('bg-red-500','bg-accent'); btn.classList.replace('text-white','text-slate-900'); 
                 rec.classList.replace('bg-red-500', 'bg-slate-600'); rec.classList.remove('animate-pulse'); 
             }
         }
         
+        // --- 5. LOG & HISTORY LOGIC ---
         function addLog() { 
             if(isTimerRunning) toggleTimer(); 
             const dist = parseFloat(document.getElementById('input-dist').value); if(!dist || dist<=0) return alert("0 km ?"); 
             state.odo += dist; 
             state.tripA += dist;
             state.tripB += dist;
-            state.logs.unshift({id: Date.now(), title: document.getElementById('input-title').value||"Trajet", date: document.getElementById('input-date').value, dist: dist.toFixed(1), max: currentMaxSpeed}); 
+            
+            // SAUVEGARDE DES POINTS GPS
+            const savedTrack = [...trackPoints]; 
+
+            state.logs.unshift({
+                id: Date.now(), 
+                title: document.getElementById('input-title').value||"Trajet", 
+                date: document.getElementById('input-date').value, 
+                dist: dist.toFixed(1), 
+                max: currentMaxSpeed,
+                track: savedTrack // On sauve le tracé ici
+            }); 
+
             saveData(); updateUI(); 
+            // Reset
             document.getElementById('input-dist').value = ""; document.getElementById('timer-display').innerText="00:00:00"; document.getElementById('hud-dist').innerText="0.0"; document.getElementById('hud-timer').innerText="00:00:00";
             document.getElementById('btn-gpx').disabled = true; document.getElementById('btn-gpx').classList.add('text-slate-400'); document.getElementById('btn-gpx').classList.remove('text-white', 'border-accent');
+        }
+
+        // --- NOUVELLES FONCTIONS HISTORIQUE ---
+        function viewOnMap(id) {
+            const log = state.logs.find(l => l.id === id);
+            if(!log || !log.track || log.track.length === 0) return alert("Pas de données GPS pour ce trajet.");
+            
+            switchTab('map');
+            const latlngs = log.track.map(p => [p.lat, p.lon]);
+            if(historyPolyline) historyPolyline.setLatLngs(latlngs);
+            map.fitBounds(historyPolyline.getBounds());
+        }
+
+        function downloadLogGPX(id) {
+            const log = state.logs.find(l => l.id === id);
+            if(!log || !log.track || log.track.length === 0) return alert("Pas de données GPS pour ce trajet.");
+            
+            let gpx = `<?xml version="1.0"?><gpx version="1.1"><trk><name>${log.title}</name><trkseg>`;
+            log.track.forEach(p => {
+                // Ensure time is ISO string
+                const t = new Date(p.time).toISOString();
+                gpx += `<trkpt lat="${p.lat}" lon="${p.lon}"><ele>${p.ele}</ele><time>${t}</time></trkpt>`;
+            });
+            gpx += `</trkseg></trk></gpx>`;
+            
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([gpx],{type:'application/gpx+xml'}));
+            a.download = `${log.title.replace(/\s+/g,'_')}_${log.date}.gpx`;
+            a.click();
         }
 
         function resetTrip(type) {
@@ -456,7 +496,6 @@
             }
         }
 
-        // --- 5. ENTRETIEN MULTI-POINTS ---
         function resetMultiMaint(key) {
             if(confirm('Valider entretien : ' + key.toUpperCase() + ' ?')) {
                 state.maintenance[key].last = state.odo;
@@ -477,38 +516,11 @@
         function renderChart() {
             const ctx = document.getElementById('rideChart');
             if(!ctx) return;
-            
-            // Prend les 7 derniers logs, inverse pour avoir chrono croissant
             const dataLogs = state.logs.slice(0, 7).reverse();
-            const labels = dataLogs.map(l => l.date.substring(5)); // MM-DD
+            const labels = dataLogs.map(l => l.date.substring(5)); 
             const distances = dataLogs.map(l => parseFloat(l.dist));
-
             if(chartInstance) chartInstance.destroy();
-
-            chartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Km',
-                        data: distances,
-                        borderColor: '#10b981',
-                        backgroundColor: 'rgba(16, 185, 129, 0.2)',
-                        borderWidth: 2,
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { display: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#94a3b8', font: {size:8} } },
-                        x: { display: true, grid: { display: false }, ticks: { color: '#94a3b8', font: {size:8} } }
-                    }
-                }
-            });
+            chartInstance = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ label: 'Km', data: distances, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.2)', borderWidth: 2, tension: 0.4, fill: true }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#94a3b8', font: {size:8} } }, x: { display: true, grid: { display: false }, ticks: { color: '#94a3b8', font: {size:8} } } } } });
         }
 
         // Utils
@@ -553,7 +565,6 @@
             document.getElementById('disp-trip-a').innerText = (state.tripA || 0).toFixed(1);
             document.getElementById('disp-trip-b').innerText = (state.tripB || 0).toFixed(1);
 
-            // MAINTENANCE MULTI
             const cont = document.getElementById('maintenance-container');
             if(cont && state.maintenance) {
                 cont.innerHTML = '';
@@ -564,7 +575,6 @@
                     const diff = state.odo - item.last;
                     const pct = Math.min(100, (diff / item.interval) * 100);
                     const isAlert = diff >= item.interval;
-                    
                     cont.innerHTML += `
                     <div class="mb-2">
                         <div class="flex justify-between text-xs text-slate-300 mb-1">
@@ -585,10 +595,37 @@
             document.getElementById('cost-car').value = state.eco.car; document.getElementById('cost-scooter').value = state.eco.scooter;
             document.getElementById('addr-home').value = state.addresses.home || ""; document.getElementById('addr-work').value = state.addresses.work || "";
 
-            const tb = document.getElementById('logs-table-body'); if(tb) { tb.innerHTML=''; if(state.logs.length===0) document.getElementById('empty-state').classList.remove('hidden'); else { document.getElementById('empty-state').classList.add('hidden'); state.logs.forEach(l => { const tr = document.createElement('tr'); tr.innerHTML = `<td class="py-2 px-1"><div class="font-bold text-slate-200">${l.title}</div><div class="text-[9px] text-slate-500">${l.date}</div></td><td class="py-2 px-1 text-right"><div class="text-accent font-bold">+${l.dist}</div><div class="text-[9px] text-slate-500">Max ${l.max||0} km/h</div></td><td class="py-2 px-1 text-right"><button onclick="deleteLog(${l.id})" class="text-slate-600 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td>`; tb.appendChild(tr); }); } }
+            const tb = document.getElementById('logs-table-body'); 
+            if(tb) { 
+                tb.innerHTML=''; 
+                if(state.logs.length===0) document.getElementById('empty-state').classList.remove('hidden'); 
+                else { 
+                    document.getElementById('empty-state').classList.add('hidden'); 
+                    state.logs.forEach(l => { 
+                        // Vérifier si des données GPS existent pour ce log
+                        const hasTrack = l.track && l.track.length > 0;
+                        const opacityClass = hasTrack ? 'opacity-100 hover:text-white' : 'opacity-30 cursor-not-allowed';
+                        
+                        const tr = document.createElement('tr'); 
+                        tr.innerHTML = `
+                        <td class="py-2 px-1">
+                            <div class="font-bold text-slate-200">${l.title}</div>
+                            <div class="text-[9px] text-slate-500">${l.date}</div>
+                        </td>
+                        <td class="py-2 px-1 text-right">
+                            <div class="text-accent font-bold">+${l.dist}</div>
+                            <div class="text-[9px] text-slate-500">Max ${l.max||0} km/h</div>
+                        </td>
+                        <td class="py-2 px-1 text-right flex justify-end gap-2 items-center h-full pt-3">
+                            <button onclick="viewOnMap(${l.id})" class="text-cyan-400 ${opacityClass}" title="Voir sur carte"><i class="fa-solid fa-eye"></i></button>
+                            <button onclick="downloadLogGPX(${l.id})" class="text-emerald-400 ${opacityClass}" title="Télécharger GPX"><i class="fa-solid fa-floppy-disk"></i></button>
+                            <button onclick="deleteLog(${l.id})" class="text-slate-600 hover:text-red-500 ml-1"><i class="fa-solid fa-trash"></i></button>
+                        </td>`; 
+                        tb.appendChild(tr); 
+                    }); 
+                } 
+            }
             renderShortcuts();
-            
-            // Render Chart if visible
             if(document.getElementById('tab-garage').classList.contains('active')) renderChart();
         }
     </script>
