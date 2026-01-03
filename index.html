@@ -118,16 +118,29 @@
         
         <div id="tab-dashboard" class="tab-content active p-3 gap-3">
             
-            <div class="grid grid-cols-2 gap-2 flex-none">
-                <div class="glass-panel rounded-xl p-2 flex flex-col items-center justify-center bg-blue-900/20 border border-blue-500/30">
-                    <span class="text-blue-400 text-[9px] font-bold uppercase mb-1"><i class="fa-solid fa-cloud-rain mr-1"></i>Météo</span>
-                    <div id="weather-content" class="text-center">
-                        <span class="text-xs text-slate-400">GPS requis</span>
+            <div class="grid grid-cols-4 gap-2 flex-none h-18">
+                <div class="glass-panel rounded-xl p-1 flex flex-col items-center justify-center bg-blue-900/20 border border-blue-500/30">
+                    <div id="weather-content" class="text-center flex flex-col items-center">
+                        <i class="fa-solid fa-cloud text-slate-400 text-lg mb-1"></i>
+                        <span class="text-[10px] font-bold text-white">--°</span>
                     </div>
                 </div>
-                <div class="glass-panel rounded-xl p-2 flex flex-col items-center justify-center bg-emerald-900/20 border border-emerald-500/30">
-                    <span class="text-emerald-400 text-[9px] font-bold uppercase mb-1"><i class="fa-solid fa-piggy-bank mr-1"></i>Économies</span>
-                    <div class="text-white font-bold font-mono"><span id="savings-display">0</span> <span class="text-xs">€</span></div>
+
+                <div class="glass-panel rounded-xl p-1 flex flex-col items-center justify-center relative">
+                    <span class="text-[8px] text-slate-500 uppercase font-bold">Trip A</span>
+                    <div class="font-mono font-bold text-white text-sm"><span id="disp-trip-a">0.0</span> <span class="text-[8px] font-normal text-slate-400">km</span></div>
+                    <button onclick="resetTrip('A')" class="absolute top-1 right-1 text-[8px] text-slate-600 hover:text-red-400 p-1"><i class="fa-solid fa-rotate-right"></i></button>
+                </div>
+
+                <div class="glass-panel rounded-xl p-1 flex flex-col items-center justify-center relative">
+                    <span class="text-[8px] text-slate-500 uppercase font-bold">Trip B</span>
+                    <div class="font-mono font-bold text-white text-sm"><span id="disp-trip-b">0.0</span> <span class="text-[8px] font-normal text-slate-400">km</span></div>
+                    <button onclick="resetTrip('B')" class="absolute top-1 right-1 text-[8px] text-slate-600 hover:text-red-400 p-1"><i class="fa-solid fa-rotate-right"></i></button>
+                </div>
+
+                <div class="glass-panel rounded-xl p-1 flex flex-col items-center justify-center bg-emerald-900/20 border border-emerald-500/30">
+                    <i class="fa-solid fa-piggy-bank text-emerald-400 text-lg mb-1"></i>
+                    <div class="text-[10px] font-bold text-white"><span id="savings-display">0</span> €</div>
                 </div>
             </div>
 
@@ -145,7 +158,6 @@
                         <i class="fa-solid fa-pen"></i> Édit
                     </button>
                 </div>
-                
                 <div class="grid grid-cols-4 gap-2" id="shortcut-grid">
                     </div>
             </div>
@@ -282,8 +294,8 @@
         function changeUserPin() { const n = document.getElementById('new-pin-input').value; if(n.length===4 && confirm('Changer PIN?')) { localStorage.setItem('scooter_pin', n); savedPin=n; alert('OK'); document.getElementById('new-pin-input').value=""; } }
         
         // --- 2. DATA ---
-        // Ajout de "shortcuts" dans le state initial
-        let state = { odo: 0, maintenanceKm: 0, maintInterval: 500, logs: [], addresses: {home:'', work:''}, eco: {car: 0.20, scooter: 0.05}, shortcuts: [null,null,null,null] };
+        // Ajout de "tripA" et "tripB"
+        let state = { odo: 0, tripA: 0, tripB: 0, maintenanceKm: 0, maintInterval: 500, logs: [], addresses: {home:'', work:''}, eco: {car: 0.20, scooter: 0.05}, shortcuts: [null,null,null,null] };
         
         function loadData() { 
             try { 
@@ -293,9 +305,9 @@
                     const old = localStorage.getItem('trackMasterV18'); 
                     if(old) state = { ...state, ...JSON.parse(old) }; 
                 } 
-                // Securité: si shortcuts n'existe pas dans le localStorage, on l'initialise
                 if(!state.shortcuts || !Array.isArray(state.shortcuts)) state.shortcuts = [null,null,null,null];
-                
+                if(typeof state.tripA === 'undefined') state.tripA = 0;
+                if(typeof state.tripB === 'undefined') state.tripB = 0;
                 updateUI(); 
             } catch(e){} 
         }
@@ -309,8 +321,13 @@
                 const temp = Math.round(data.current.temperature_2m);
                 const rain = data.current.precipitation_probability;
                 let icon = rain > 50 ? '<i class="fa-solid fa-cloud-showers-heavy text-blue-400"></i>' : (rain > 20 ? '<i class="fa-solid fa-cloud-rain text-blue-300"></i>' : (temp > 20 ? '<i class="fa-solid fa-sun text-yellow-400"></i>' : '<i class="fa-solid fa-cloud text-slate-300"></i>'));
-                document.getElementById('weather-content').innerHTML = `<div class="text-xl font-bold text-white">${icon} ${temp}°C</div><div class="text-[10px] text-blue-300 font-bold">Pluie: ${rain}%</div>`;
-            } catch(e) { document.getElementById('weather-content').innerHTML = '<span class="text-xs text-red-400">Erreur météo</span>'; }
+                
+                // Version compacte pour la grille de 4
+                document.getElementById('weather-content').innerHTML = `
+                    <div class="text-xl mb-0 text-white">${icon}</div>
+                    <span class="text-[10px] font-bold text-white leading-none">${temp}°</span>
+                `;
+            } catch(e) { document.getElementById('weather-content').innerHTML = '<span class="text-[8px] text-red-400">Erreur</span>'; }
         }
 
         function saveEcoSettings() {
@@ -379,7 +396,18 @@
                         if(trackPoints.length > 1) {
                             const last = trackPoints[trackPoints.length-2];
                             const d = 6371 * 2 * Math.atan2(Math.sqrt(Math.sin((lat-last.lat)*Math.PI/360)**2 + Math.cos(last.lat*Math.PI/180)*Math.cos(lat*Math.PI/180)*Math.sin((lon-last.lon)*Math.PI/360)**2), Math.sqrt(1-Math.sin((lat-last.lat)*Math.PI/360)**2 - Math.cos(last.lat*Math.PI/180)*Math.cos(lat*Math.PI/180)*Math.sin((lon-last.lon)*Math.PI/360)**2));
-                            if(d > 0.002) { currentTripDist += d; document.getElementById('dash-dist').innerText = currentTripDist.toFixed(2); document.getElementById('hud-dist').innerText = currentTripDist.toFixed(1); document.getElementById('input-dist').value = currentTripDist.toFixed(2); }
+                            if(d > 0.002) { 
+                                currentTripDist += d; 
+                                // UPDATE DES TRIPS (A et B)
+                                state.tripA = (state.tripA || 0) + d;
+                                state.tripB = (state.tripB || 0) + d;
+                                saveData();
+                                updateUI(); // Rafraichit l'affichage
+
+                                document.getElementById('dash-dist').innerText = currentTripDist.toFixed(2); 
+                                document.getElementById('hud-dist').innerText = currentTripDist.toFixed(1); 
+                                document.getElementById('input-dist').value = currentTripDist.toFixed(2); 
+                            }
                         }
                         document.getElementById('btn-gpx').disabled = false; document.getElementById('btn-gpx').classList.remove('text-slate-400'); document.getElementById('btn-gpx').classList.add('text-white', 'border-accent');
                     }
@@ -411,6 +439,15 @@
             saveData(); updateUI(); 
             document.getElementById('input-dist').value = ""; document.getElementById('timer-display').innerText="00:00:00"; document.getElementById('hud-dist').innerText="0.0"; document.getElementById('hud-timer').innerText="00:00:00";
             document.getElementById('btn-gpx').disabled = true; document.getElementById('btn-gpx').classList.add('text-slate-400'); document.getElementById('btn-gpx').classList.remove('text-white', 'border-accent');
+        }
+
+        function resetTrip(type) {
+            if(confirm('Remettre Trip ' + type + ' à zéro ?')) {
+                if(type === 'A') state.tripA = 0;
+                if(type === 'B') state.tripB = 0;
+                saveData();
+                updateUI();
+            }
         }
 
         // Utils
@@ -541,6 +578,11 @@
 
         function updateUI() { 
             if(document.getElementById('odo-input')) document.getElementById('odo-input').value = state.odo.toFixed(1);
+            
+            // TRIPS
+            document.getElementById('disp-trip-a').innerText = (state.tripA || 0).toFixed(1);
+            document.getElementById('disp-trip-b').innerText = (state.tripB || 0).toFixed(1);
+
             // Maintenance
             const last = state.maintenanceKm || 0; const interv = state.maintInterval || 500; const diff = state.odo - last; 
             document.getElementById('maint-last').innerText = last.toFixed(0); document.getElementById('maint-next').innerText = (last + interv).toFixed(0);
