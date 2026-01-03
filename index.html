@@ -12,7 +12,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2641/2641271.png">
     
-    <title>ScooterMaster V24 Ultimate</title>
+    <title>ScooterMaster V25 Ultimate</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -61,7 +61,7 @@
     <div id="login-overlay">
         <div class="mb-8 flex flex-col items-center">
             <i class="fa-solid fa-crown text-4xl text-accent mb-4"></i>
-            <h2 class="text-white font-bold text-xl uppercase tracking-widest">Ultimate V24</h2>
+            <h2 class="text-white font-bold text-xl uppercase tracking-widest">Ultimate V25</h2>
             <p class="text-slate-500 text-xs mt-1">Code PIN requis</p>
             <p id="login-error" class="text-red-500 text-xs font-bold mt-2">Code Incorrect</p>
         </div>
@@ -77,7 +77,6 @@
     <div id="app-modal" class="fixed inset-0 z-[1000] bg-slate-900/90 backdrop-blur-sm hidden flex-col items-center justify-center p-6">
         <div class="glass-panel w-full max-w-sm p-5 rounded-2xl border border-slate-600 shadow-2xl relative">
             <h3 class="text-white font-bold text-lg mb-4 text-center">Ajouter un raccourci</h3>
-            
             <label class="block text-xs text-slate-400 mb-1">Type d'application</label>
             <select id="app-select" onchange="prefillApp()" class="w-full bg-slate-950 border border-slate-700 rounded p-3 text-white mb-3 outline-none focus:border-accent">
                 <option value="custom">-- Choisir ou Personnaliser --</option>
@@ -89,38 +88,25 @@
                 <option value="maps|https://maps.google.com|fa-solid fa-map-location-dot|#10b981">Google Maps</option>
                 <option value="tel|tel:|fa-solid fa-phone|#ffffff">Téléphone</option>
             </select>
-    
             <label class="block text-xs text-slate-400 mb-1">Nom (Optionnel)</label>
             <input type="text" id="app-name" class="w-full bg-slate-800 border border-slate-600 rounded p-2 text-white mb-3 outline-none text-sm" placeholder="Ex: Spotify">
-    
             <label class="block text-xs text-slate-400 mb-1">Lien / URI</label>
             <input type="text" id="app-url" class="w-full bg-slate-800 border border-slate-600 rounded p-2 text-white mb-3 outline-none text-xs font-mono" placeholder="spotify:">
-    
             <input type="hidden" id="app-icon" value="fa-solid fa-cube">
             <input type="hidden" id="app-color" value="#ffffff">
-    
             <div class="grid grid-cols-2 gap-3 mt-4">
                 <button onclick="closeAppModal()" class="bg-slate-700 text-slate-300 py-3 rounded-xl font-bold">Annuler</button>
                 <button onclick="saveShortcut()" class="bg-accent text-slate-900 py-3 rounded-xl font-bold">Sauver</button>
             </div>
-            
             <button id="btn-delete-app" onclick="deleteCurrentShortcut()" class="w-full mt-3 py-2 text-red-400 text-xs border border-red-900/50 rounded hover:bg-red-900/20 hidden">Supprimer ce raccourci</button>
         </div>
     </div>
 
     <nav class="glass-panel sticky top-0 z-50 border-b border-slate-700/50 pt-safe-top h-16 flex-none flex justify-between items-center px-4">
-        <div class="flex items-center gap-2 text-slate-500 z-10 w-20">
-            <span class="text-[10px] font-bold uppercase tracking-wider">V24</span>
-        </div>
-        
-        <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center gap-3">
-             <div class="text-3xl font-black text-white digital-clock font-mono" id="clock-display">--:--</div>
-        </div>
-
+        <div class="flex items-center gap-2 text-slate-500 z-10 w-20"><span class="text-[10px] font-bold uppercase tracking-wider">V25</span></div>
+        <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center gap-3"><div class="text-3xl font-black text-white digital-clock font-mono" id="clock-display">--:--</div></div>
         <div class="flex items-center justify-end gap-3 z-10 w-auto">
-            <div id="top-weather" class="flex items-center gap-2 text-xs font-bold text-slate-300">
-                <span class="text-[9px] opacity-50">GPS?</span>
-            </div>
+            <div id="top-weather" class="flex items-center gap-2 text-xs font-bold text-slate-300"><span class="text-[9px] opacity-50">GPS?</span></div>
             <div class="h-4 w-[1px] bg-slate-700"></div>
             <i id="wake-icon" class="fa-solid fa-lightbulb text-slate-600 text-sm transition-colors duration-500"></i>
         </div>
@@ -131,25 +117,21 @@
         <div id="tab-dashboard" class="tab-content active p-3 gap-3">
             
             <div class="grid grid-cols-4 gap-2 flex-none h-18">
-                
                 <div class="glass-panel rounded-xl p-1 flex flex-col items-center justify-center bg-slate-800/40">
                     <span class="text-[8px] text-slate-500 uppercase font-bold">Total</span>
                     <div class="font-mono font-bold text-white text-sm"><span id="disp-odo-total">0.0</span></div>
                     <span class="text-[7px] text-slate-500">km</span>
                 </div>
-
                 <div class="glass-panel rounded-xl p-1 flex flex-col items-center justify-center relative">
                     <span class="text-[8px] text-accent uppercase font-bold">Trip A</span>
                     <div class="font-mono font-bold text-white text-sm"><span id="disp-trip-a">0.0</span></div>
                     <button onclick="resetTrip('A')" class="absolute top-1 right-1 text-[8px] text-slate-600 hover:text-red-400 p-1"><i class="fa-solid fa-rotate-right"></i></button>
                 </div>
-
                 <div class="glass-panel rounded-xl p-1 flex flex-col items-center justify-center relative">
                     <span class="text-[8px] text-warning uppercase font-bold">Trip B</span>
                     <div class="font-mono font-bold text-white text-sm"><span id="disp-trip-b">0.0</span></div>
                     <button onclick="resetTrip('B')" class="absolute top-1 right-1 text-[8px] text-slate-600 hover:text-red-400 p-1"><i class="fa-solid fa-rotate-right"></i></button>
                 </div>
-
                 <div class="glass-panel rounded-xl p-1 flex flex-col items-center justify-center bg-emerald-900/20 border border-emerald-500/30">
                     <i class="fa-solid fa-piggy-bank text-emerald-400 text-sm mb-1"></i>
                     <div class="text-[10px] font-bold text-white"><span id="savings-display">0</span> €</div>
@@ -163,12 +145,8 @@
 
             <div class="glass-panel rounded-xl p-3 border border-slate-600 flex-none shadow-lg mt-1">
                 <div class="flex justify-between items-center mb-2">
-                    <h3 class="text-slate-400 text-[10px] uppercase font-bold flex items-center gap-2">
-                        <i class="fa-solid fa-rocket text-accent"></i> Mes Apps
-                    </h3>
-                    <button onclick="toggleEditMode()" id="edit-mode-btn" class="text-[9px] text-slate-500 bg-slate-800 px-2 py-1 rounded border border-slate-700 hover:text-white transition">
-                        <i class="fa-solid fa-pen"></i> Édit
-                    </button>
+                    <h3 class="text-slate-400 text-[10px] uppercase font-bold flex items-center gap-2"><i class="fa-solid fa-rocket text-accent"></i> Mes Apps</h3>
+                    <button onclick="toggleEditMode()" id="edit-mode-btn" class="text-[9px] text-slate-500 bg-slate-800 px-2 py-1 rounded border border-slate-700 hover:text-white transition"><i class="fa-solid fa-pen"></i> Édit</button>
                 </div>
                 <div class="grid grid-cols-4 gap-2" id="shortcut-grid"></div>
             </div>
@@ -213,6 +191,12 @@
 
         <div id="tab-map" class="tab-content h-full relative p-0 overflow-hidden">
             <div id="map" class="w-full h-full"></div>
+            <div class="hud-overlay" style="bottom: 9rem; right: 1rem; pointer-events: auto;">
+                <button onclick="toggleMapTheme()" class="bg-slate-800 text-white w-10 h-10 rounded-full shadow-lg border border-slate-600 flex items-center justify-center active:scale-90 transition">
+                    <i id="map-theme-icon" class="fa-solid fa-sun text-yellow-400"></i>
+                </button>
+            </div>
+
             <div class="hud-overlay hud-top-left">
                 <div class="text-[10px] text-accent uppercase font-bold">Vitesse</div>
                 <div class="text-6xl font-black font-mono text-white leading-none tracking-tighter" id="hud-speed">0</div>
@@ -240,36 +224,32 @@
             </div>
 
             <div class="glass-panel rounded-xl p-4 border border-slate-600 flex-none">
-                <h3 class="text-slate-400 text-xs uppercase font-bold mb-3"><i class="fa-solid fa-map-pin mr-2"></i>Adresses Rapides</h3>
-                <div class="flex flex-col gap-2">
-                    <input type="text" id="addr-home" onchange="saveAddresses()" class="bg-slate-900 border border-slate-700 rounded px-2 py-2 text-white text-xs w-full" placeholder="Adresse Maison (ex: 12 Rue de la Paix, Paris)">
-                    <input type="text" id="addr-work" onchange="saveAddresses()" class="bg-slate-900 border border-slate-700 rounded px-2 py-2 text-white text-xs w-full" placeholder="Adresse Travail">
+                <h3 class="text-slate-400 text-xs uppercase font-bold mb-3"><i class="fa-solid fa-chart-line mr-2"></i>Statistiques (7 derniers)</h3>
+                <div class="h-40 w-full relative">
+                    <canvas id="rideChart"></canvas>
                 </div>
+            </div>
+
+            <div class="glass-panel rounded-xl p-4 border border-slate-600 relative overflow-hidden flex-none">
+                <h3 class="text-white font-bold mb-4 text-xs uppercase"><i class="fa-solid fa-wrench text-warning mr-2"></i>Entretien</h3>
+                <div id="maintenance-container" class="space-y-4">
+                    </div>
             </div>
 
             <div class="glass-panel rounded-xl p-4 border border-slate-600 flex-none">
                 <h3 class="text-emerald-400 text-xs uppercase font-bold mb-3"><i class="fa-solid fa-money-bill-wave mr-2"></i>Calculateur Économies</h3>
                 <div class="grid grid-cols-2 gap-2 text-xs">
-                    <div>
-                        <label class="text-slate-500 block mb-1">Coût Voiture (€/km)</label>
-                        <input type="number" id="cost-car" step="0.01" onchange="saveEcoSettings()" class="bg-slate-900 border border-slate-700 rounded px-2 py-2 text-white w-full" placeholder="0.20">
-                    </div>
-                    <div>
-                        <label class="text-slate-500 block mb-1">Coût Scooter (€/km)</label>
-                        <input type="number" id="cost-scooter" step="0.01" onchange="saveEcoSettings()" class="bg-slate-900 border border-slate-700 rounded px-2 py-2 text-white w-full" placeholder="0.05">
-                    </div>
+                    <div><label class="text-slate-500 block mb-1">Coût Voiture</label><input type="number" id="cost-car" step="0.01" onchange="saveEcoSettings()" class="bg-slate-900 border border-slate-700 rounded px-2 py-2 text-white w-full" placeholder="0.20"></div>
+                    <div><label class="text-slate-500 block mb-1">Coût Scooter</label><input type="number" id="cost-scooter" step="0.01" onchange="saveEcoSettings()" class="bg-slate-900 border border-slate-700 rounded px-2 py-2 text-white w-full" placeholder="0.05"></div>
                 </div>
-                <p class="text-[9px] text-slate-500 mt-2 italic">Basé sur le kilométrage total.</p>
             </div>
-            
-            <div class="glass-panel rounded-xl p-4 border border-slate-600 relative overflow-hidden flex-none">
-                <div class="flex justify-between items-start mb-4"><h3 class="text-white font-bold"><i class="fa-solid fa-wrench text-warning mr-2"></i>Entretien</h3><button onclick="resetMaintenance()" class="text-[10px] bg-slate-700 px-2 py-1 rounded text-white hover:bg-accent">Fait !</button></div>
-                <div class="relative pt-1 mb-4">
-                    <div class="flex justify-between text-xs text-slate-400 mb-1"><span>Fait à: <span id="maint-last">0</span></span><span>Prochain: <span id="maint-next">0</span></span></div>
-                    <div class="overflow-hidden h-3 mb-2 text-xs flex rounded-full bg-slate-700 border border-slate-600"><div id="maint-bar" style="width: 0%" class="bg-accent transition-all duration-500"></div></div>
-                    <div class="flex justify-between items-center"><span class="text-[10px] text-slate-400" id="maint-remaining-text">Reste: 0 km</span><div id="maint-alert" class="hidden text-red-400 text-xs font-bold animate-pulse"><i class="fa-solid fa-triangle-exclamation"></i></div></div>
+
+            <div class="glass-panel rounded-xl p-4 border border-slate-600 flex-none">
+                <h3 class="text-slate-400 text-xs uppercase font-bold mb-3"><i class="fa-solid fa-map-pin mr-2"></i>Adresses Rapides</h3>
+                <div class="flex flex-col gap-2">
+                    <input type="text" id="addr-home" onchange="saveAddresses()" class="bg-slate-900 border border-slate-700 rounded px-2 py-2 text-white text-xs w-full" placeholder="Maison">
+                    <input type="text" id="addr-work" onchange="saveAddresses()" class="bg-slate-900 border border-slate-700 rounded px-2 py-2 text-white text-xs w-full" placeholder="Travail">
                 </div>
-                <div class="pt-4 border-t border-slate-700 flex gap-2"><input type="number" id="maint-interval-input" class="bg-slate-900 border border-slate-700 rounded text-white px-2 py-2 text-sm w-full font-mono" placeholder="Intervalle"><button onclick="saveMaintSettings()" class="bg-slate-700 text-white px-3 rounded"><i class="fa-solid fa-check"></i></button></div>
             </div>
 
             <div class="glass-panel rounded-xl p-4 border border-slate-600 flex-none">
@@ -307,19 +287,26 @@
         function changeUserPin() { const n = document.getElementById('new-pin-input').value; if(n.length===4 && confirm('Changer PIN?')) { localStorage.setItem('scooter_pin', n); savedPin=n; alert('OK'); document.getElementById('new-pin-input').value=""; } }
         
         // --- 2. DATA ---
-        let state = { odo: 0, tripA: 0, tripB: 0, maintenanceKm: 0, maintInterval: 500, logs: [], addresses: {home:'', work:''}, eco: {car: 0.20, scooter: 0.05}, shortcuts: [null,null,null,null] };
+        // Ajout structure maintenance objet
+        let state = { odo: 0, tripA: 0, tripB: 0, maintenance: null, logs: [], addresses: {home:'', work:''}, eco: {car: 0.20, scooter: 0.05}, shortcuts: [null,null,null,null] };
         
         function loadData() { 
             try { 
                 const d = localStorage.getItem('trackMasterV24'); 
-                if(d) state = { ...state, ...JSON.parse(d) }; 
-                else { 
-                    const old = localStorage.getItem('trackMasterV18'); 
-                    if(old) state = { ...state, ...JSON.parse(old) }; 
+                if(d) {
+                    const loaded = JSON.parse(d);
+                    state = { ...state, ...loaded };
+                    // MIGRATION ENTRETIEN
+                    if(!state.maintenance || typeof state.maintenance !== 'object') {
+                        state.maintenance = {
+                            general: { last: loaded.maintenanceKm || 0, interval: loaded.maintInterval || 500 },
+                            brakes: { last: state.odo, interval: 1500 },
+                            tires: { last: state.odo, interval: 3000 }
+                        };
+                    }
                 } 
                 if(!state.shortcuts || !Array.isArray(state.shortcuts)) state.shortcuts = [null,null,null,null];
-                if(isNaN(state.tripA)) state.tripA = 0;
-                if(isNaN(state.tripB)) state.tripB = 0;
+                if(isNaN(state.tripA)) state.tripA = 0; if(isNaN(state.tripB)) state.tripB = 0;
                 updateUI(); 
             } catch(e){} 
         }
@@ -359,18 +346,37 @@
             }
         }
 
-        // --- 4. GPS CORE ---
+        // --- 4. GPS CORE & MAP THEME ---
         let map, polyline, marker, watchId, isTimerRunning=false, timerInterval, timerSeconds=0, currentTripDist=0, trackPoints=[], currentMaxSpeed=0;
+        let mapTileLayer, isDarkMap = true;
         let wakeLock=null; async function requestWakeLock(){ if('wakeLock' in navigator) try{ wakeLock=await navigator.wakeLock.request('screen'); document.getElementById('wake-icon').classList.add('wake-active'); }catch(e){} }
         
         window.onload = function() { loadData(); document.getElementById('input-date').valueAsDate = new Date(); initMap(); requestWakeLock(); };
 
         function initMap() { 
             map = L.map('map', {zoomControl:false}).setView([48.85, 2.35], 16);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {maxZoom: 20}).addTo(map);
+            // Default Dark
+            mapTileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {maxZoom: 20}).addTo(map);
+            
             const arrowIcon = L.divIcon({ className:'custom-div-icon', html:"<div class='nav-arrow-container'><div id='gps-arrow' class='nav-arrow'></div></div>", iconSize:[40,40], iconAnchor:[20,20] });
             marker = L.marker([0,0], {icon: arrowIcon}).addTo(map);
             polyline = L.polyline([], {color:'#10b981', weight:5}).addTo(map);
+        }
+
+        function toggleMapTheme() {
+            isDarkMap = !isDarkMap;
+            const url = isDarkMap 
+                ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' 
+                : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+            mapTileLayer.setUrl(url);
+            
+            const btn = document.getElementById('map-theme-icon');
+            if(isDarkMap) {
+                btn.className = "fa-solid fa-sun text-yellow-400";
+                document.getElementById('map').classList.remove('brightness-125');
+            } else {
+                btn.className = "fa-solid fa-moon text-slate-300";
+            }
         }
 
         function centerMap() { if(!navigator.geolocation) return alert("Pas de GPS"); navigator.geolocation.getCurrentPosition(p=>{map.setView([p.coords.latitude, p.coords.longitude], 18);}); }
@@ -404,7 +410,6 @@
                             const d = 6371 * 2 * Math.atan2(Math.sqrt(Math.sin((lat-last.lat)*Math.PI/360)**2 + Math.cos(last.lat*Math.PI/180)*Math.cos(lat*Math.PI/180)*Math.sin((lon-last.lon)*Math.PI/360)**2), Math.sqrt(1-Math.sin((lat-last.lat)*Math.PI/360)**2 - Math.cos(last.lat*Math.PI/180)*Math.cos(lat*Math.PI/180)*Math.sin((lon-last.lon)*Math.PI/360)**2));
                             if(d > 0.002) { 
                                 currentTripDist += d; 
-                                // On n'ajoute PAS aux Trips ici, seulement à l'affichage session
                                 document.getElementById('dash-dist').innerText = currentTripDist.toFixed(2); 
                                 document.getElementById('hud-dist').innerText = currentTripDist.toFixed(1); 
                                 document.getElementById('input-dist').value = currentTripDist.toFixed(2); 
@@ -416,7 +421,6 @@
             } else { navigator.geolocation.clearWatch(watchId); document.getElementById('gps-status').innerText = "OFF"; document.getElementById('dash-speed').innerText = "0"; document.getElementById('hud-speed').innerText = "0"; }
         }
 
-        // --- 5. LOGIC ---
         function toggleTimer() {
             const btn = document.getElementById('btn-timer'); const rec = document.getElementById('rec-dot');
             if(!isTimerRunning) {
@@ -432,13 +436,12 @@
             }
         }
         
-        // CORRECTION MAJEURE: Ajout aux Trips A/B lors de la sauvegarde
         function addLog() { 
             if(isTimerRunning) toggleTimer(); 
             const dist = parseFloat(document.getElementById('input-dist').value); if(!dist || dist<=0) return alert("0 km ?"); 
             state.odo += dist; 
-            state.tripA += dist; // INCREMENTE TRIP A
-            state.tripB += dist; // INCREMENTE TRIP B
+            state.tripA += dist;
+            state.tripB += dist;
             state.logs.unshift({id: Date.now(), title: document.getElementById('input-title').value||"Trajet", date: document.getElementById('input-date').value, dist: dist.toFixed(1), max: currentMaxSpeed}); 
             saveData(); updateUI(); 
             document.getElementById('input-dist').value = ""; document.getElementById('timer-display').innerText="00:00:00"; document.getElementById('hud-dist').innerText="0.0"; document.getElementById('hud-timer').innerText="00:00:00";
@@ -449,29 +452,77 @@
             if(confirm('Remettre Trip ' + type + ' à zéro ?')) {
                 if(type === 'A') state.tripA = 0;
                 if(type === 'B') state.tripB = 0;
-                saveData();
-                updateUI();
+                saveData(); updateUI();
             }
         }
 
+        // --- 5. ENTRETIEN MULTI-POINTS ---
+        function resetMultiMaint(key) {
+            if(confirm('Valider entretien : ' + key.toUpperCase() + ' ?')) {
+                state.maintenance[key].last = state.odo;
+                saveData(); updateUI();
+            }
+        }
+        function setMaintInterval(key) {
+            const current = state.maintenance[key].interval;
+            const newVal = prompt("Nouvel intervalle pour " + key + " (km):", current);
+            if(newVal && !isNaN(newVal)) {
+                state.maintenance[key].interval = parseFloat(newVal);
+                saveData(); updateUI();
+            }
+        }
+
+        // --- 6. CHART ---
+        let chartInstance = null;
+        function renderChart() {
+            const ctx = document.getElementById('rideChart');
+            if(!ctx) return;
+            
+            // Prend les 7 derniers logs, inverse pour avoir chrono croissant
+            const dataLogs = state.logs.slice(0, 7).reverse();
+            const labels = dataLogs.map(l => l.date.substring(5)); // MM-DD
+            const distances = dataLogs.map(l => parseFloat(l.dist));
+
+            if(chartInstance) chartInstance.destroy();
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Km',
+                        data: distances,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { display: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#94a3b8', font: {size:8} } },
+                        x: { display: true, grid: { display: false }, ticks: { color: '#94a3b8', font: {size:8} } }
+                    }
+                }
+            });
+        }
+
         // Utils
-        function saveMaintSettings() { const val=parseFloat(document.getElementById('maint-interval-input').value); if(val>0){state.maintInterval=val; saveData(); updateUI(); alert('OK');} }
-        function resetMaintenance() { if(confirm('Entretien fait ?')) { state.maintenanceKm = state.odo; saveData(); updateUI(); } }
         function exportCurrentGPX() { if(trackPoints.length<2) return alert("Pas de trajet"); let gpx=`<?xml version="1.0"?><gpx version="1.1"><trk><trkseg>`; trackPoints.forEach(p=>{gpx+=`<trkpt lat="${p.lat}" lon="${p.lon}"><ele>${p.ele}</ele><time>${p.time.toISOString()}</time></trkpt>`;}); gpx+=`</trkseg></trk></gpx>`; const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([gpx],{type:'application/gpx+xml'})); a.download=`Trajet.gpx`; a.click(); }
         function exportJSON() { const a=document.createElement('a'); a.href="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(state)); a.download="backup.json"; a.click(); }
         function importJSON(i) { const r=new FileReader(); r.onload=e=>{ state={...state, ...JSON.parse(e.target.result)}; saveData(); updateUI(); alert("OK"); }; r.readAsText(i.files[0]); }
         function deleteLog(id) { if(confirm('Supprimer ?')) { const i=state.logs.findIndex(l=>l.id===id); if(i>-1) { state.odo-=parseFloat(state.logs[i].dist); state.logs.splice(i,1); saveData(); updateUI(); } } }
         function manualUpdateODO(v) { state.odo = parseFloat(v); saveData(); updateUI(); }
-        function switchTab(id) { document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active')); document.getElementById('tab-'+id).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(e=>e.classList.remove('active')); document.getElementById('nav-'+id).classList.add('active'); if(id==='map') setTimeout(()=>{ if(map) { map.invalidateSize(); centerMap(); } },200); } 
+        function switchTab(id) { document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active')); document.getElementById('tab-'+id).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(e=>e.classList.remove('active')); document.getElementById('nav-'+id).classList.add('active'); if(id==='map') setTimeout(()=>{ if(map) { map.invalidateSize(); centerMap(); } },200); if(id==='garage') renderChart(); } 
 
-        // --- 6. APPS ---
-        let isEditMode = false;
-        let currentSlotIndex = -1;
-
+        // Apps
+        let isEditMode = false, currentSlotIndex = -1;
         function renderShortcuts() {
-            const grid = document.getElementById('shortcut-grid');
-            if (!grid) return;
-            grid.innerHTML = '';
+            const grid = document.getElementById('shortcut-grid'); if (!grid) return; grid.innerHTML = '';
             state.shortcuts.forEach((app, index) => {
                 const btn = document.createElement('div');
                 if (app) {
@@ -489,48 +540,11 @@
                 grid.appendChild(btn);
             });
         }
-
-        function toggleEditMode() {
-            isEditMode = !isEditMode;
-            const btn = document.getElementById('edit-mode-btn');
-            if (isEditMode) { btn.classList.add('bg-yellow-500', 'text-slate-900', 'border-yellow-600'); btn.classList.remove('bg-slate-800', 'text-slate-500'); btn.innerHTML = '<i class="fa-solid fa-check"></i> OK'; } 
-            else { btn.classList.remove('bg-yellow-500', 'text-slate-900', 'border-yellow-600'); btn.classList.add('bg-slate-800', 'text-slate-500'); btn.innerHTML = '<i class="fa-solid fa-pen"></i> Édit'; }
-            renderShortcuts();
-        }
-
-        function openAppModal(index) {
-            currentSlotIndex = index;
-            const modal = document.getElementById('app-modal');
-            const existing = state.shortcuts[index];
-            document.getElementById('app-select').value = 'custom';
-            if (existing) {
-                document.getElementById('app-name').value = existing.name; document.getElementById('app-url').value = existing.url;
-                document.getElementById('app-icon').value = existing.icon; document.getElementById('app-color').value = existing.color;
-                document.getElementById('btn-delete-app').classList.remove('hidden');
-            } else {
-                document.getElementById('app-name').value = ""; document.getElementById('app-url').value = "";
-                document.getElementById('app-icon').value = "fa-solid fa-cube"; document.getElementById('app-color').value = "#ffffff";
-                document.getElementById('btn-delete-app').classList.add('hidden');
-            }
-            modal.classList.remove('hidden'); modal.classList.add('flex');
-        }
-
+        function toggleEditMode() { isEditMode = !isEditMode; const btn = document.getElementById('edit-mode-btn'); if (isEditMode) { btn.classList.add('bg-yellow-500', 'text-slate-900', 'border-yellow-600'); btn.classList.remove('bg-slate-800', 'text-slate-500'); btn.innerHTML = '<i class="fa-solid fa-check"></i> OK'; } else { btn.classList.remove('bg-yellow-500', 'text-slate-900', 'border-yellow-600'); btn.classList.add('bg-slate-800', 'text-slate-500'); btn.innerHTML = '<i class="fa-solid fa-pen"></i> Édit'; } renderShortcuts(); }
+        function openAppModal(index) { currentSlotIndex = index; const modal = document.getElementById('app-modal'); const existing = state.shortcuts[index]; document.getElementById('app-select').value = 'custom'; if (existing) { document.getElementById('app-name').value = existing.name; document.getElementById('app-url').value = existing.url; document.getElementById('app-icon').value = existing.icon; document.getElementById('app-color').value = existing.color; document.getElementById('btn-delete-app').classList.remove('hidden'); } else { document.getElementById('app-name').value = ""; document.getElementById('app-url').value = ""; document.getElementById('app-icon').value = "fa-solid fa-cube"; document.getElementById('app-color').value = "#ffffff"; document.getElementById('btn-delete-app').classList.add('hidden'); } modal.classList.remove('hidden'); modal.classList.add('flex'); }
         function closeAppModal() { document.getElementById('app-modal').classList.add('hidden'); document.getElementById('app-modal').classList.remove('flex'); }
-        function prefillApp() {
-            const val = document.getElementById('app-select').value; if (val === 'custom') return;
-            const [name, url, icon, color] = val.split('|');
-            document.getElementById('app-name').value = name; document.getElementById('app-url').value = url;
-            document.getElementById('app-icon').value = icon; document.getElementById('app-color').value = color;
-        }
-
-        function saveShortcut() {
-            const name = document.getElementById('app-name').value; const url = document.getElementById('app-url').value;
-            const icon = document.getElementById('app-icon').value; const color = document.getElementById('app-color').value;
-            if (!name || !url) return alert("Nom et lien requis");
-            state.shortcuts[currentSlotIndex] = { name, url, icon, color };
-            saveData(); renderShortcuts(); closeAppModal(); if(isEditMode) toggleEditMode(); 
-        }
-
+        function prefillApp() { const val = document.getElementById('app-select').value; if (val === 'custom') return; const [name, url, icon, color] = val.split('|'); document.getElementById('app-name').value = name; document.getElementById('app-url').value = url; document.getElementById('app-icon').value = icon; document.getElementById('app-color').value = color; }
+        function saveShortcut() { const name = document.getElementById('app-name').value; const url = document.getElementById('app-url').value; const icon = document.getElementById('app-icon').value; const color = document.getElementById('app-color').value; if (!name || !url) return alert("Nom et lien requis"); state.shortcuts[currentSlotIndex] = { name, url, icon, color }; saveData(); renderShortcuts(); closeAppModal(); if(isEditMode) toggleEditMode(); }
         function deleteCurrentShortcut() { if(confirm('Supprimer ce raccourci ?')) { state.shortcuts[currentSlotIndex] = null; saveData(); renderShortcuts(); closeAppModal(); } }
 
         function updateUI() { 
@@ -539,11 +553,33 @@
             document.getElementById('disp-trip-a').innerText = (state.tripA || 0).toFixed(1);
             document.getElementById('disp-trip-b').innerText = (state.tripB || 0).toFixed(1);
 
-            const last = state.maintenanceKm || 0; const interv = state.maintInterval || 500; const diff = state.odo - last; 
-            document.getElementById('maint-last').innerText = last.toFixed(0); document.getElementById('maint-next').innerText = (last + interv).toFixed(0);
-            document.getElementById('maint-remaining-text').innerText = "Reste: " + Math.max(0, interv - diff).toFixed(1) + " km";
-            const bar = document.getElementById('maint-bar'); bar.style.width = Math.min(100, (diff/interv)*100) + "%"; 
-            if(diff >= interv) { bar.classList.replace('bg-accent','bg-red-500'); document.getElementById('maint-alert').classList.remove('hidden'); } else { bar.classList.replace('bg-red-500','bg-accent'); document.getElementById('maint-alert').classList.add('hidden'); } 
+            // MAINTENANCE MULTI
+            const cont = document.getElementById('maintenance-container');
+            if(cont && state.maintenance) {
+                cont.innerHTML = '';
+                const keys = { general: 'Général', brakes: 'Freins', tires: 'Pneus' };
+                const icons = { general: 'fa-wrench', brakes: 'fa-circle-stop', tires: 'fa-road' };
+                for (const [key, label] of Object.entries(keys)) {
+                    const item = state.maintenance[key];
+                    const diff = state.odo - item.last;
+                    const pct = Math.min(100, (diff / item.interval) * 100);
+                    const isAlert = diff >= item.interval;
+                    
+                    cont.innerHTML += `
+                    <div class="mb-2">
+                        <div class="flex justify-between text-xs text-slate-300 mb-1">
+                            <span><i class="fa-solid ${icons[key]} text-[10px] mr-1 text-slate-500"></i>${label}</span>
+                            <span class="cursor-pointer hover:text-white" onclick="setMaintInterval('${key}')">${diff.toFixed(0)} / ${item.interval}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="flex-grow overflow-hidden h-2 rounded-full bg-slate-700">
+                                <div style="width: ${pct}%" class="h-full transition-all duration-500 ${isAlert ? 'bg-red-500 animate-pulse' : 'bg-accent'}"></div>
+                            </div>
+                            <button onclick="resetMultiMaint('${key}')" class="text-[9px] bg-slate-700 px-2 py-0.5 rounded text-white hover:bg-accent hover:text-black font-bold">FAIT</button>
+                        </div>
+                    </div>`;
+                }
+            }
             
             document.getElementById('savings-display').innerText = ((state.eco.car - state.eco.scooter) * state.odo).toFixed(0);
             document.getElementById('cost-car').value = state.eco.car; document.getElementById('cost-scooter').value = state.eco.scooter;
@@ -551,6 +587,9 @@
 
             const tb = document.getElementById('logs-table-body'); if(tb) { tb.innerHTML=''; if(state.logs.length===0) document.getElementById('empty-state').classList.remove('hidden'); else { document.getElementById('empty-state').classList.add('hidden'); state.logs.forEach(l => { const tr = document.createElement('tr'); tr.innerHTML = `<td class="py-2 px-1"><div class="font-bold text-slate-200">${l.title}</div><div class="text-[9px] text-slate-500">${l.date}</div></td><td class="py-2 px-1 text-right"><div class="text-accent font-bold">+${l.dist}</div><div class="text-[9px] text-slate-500">Max ${l.max||0} km/h</div></td><td class="py-2 px-1 text-right"><button onclick="deleteLog(${l.id})" class="text-slate-600 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td>`; tb.appendChild(tr); }); } }
             renderShortcuts();
+            
+            // Render Chart if visible
+            if(document.getElementById('tab-garage').classList.contains('active')) renderChart();
         }
     </script>
 </body>
