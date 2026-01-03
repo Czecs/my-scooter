@@ -11,7 +11,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2641/2641271.png">
     
-    <title>ScooterMaster V42</title>
+    <title>ScooterMaster V43</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -36,17 +36,10 @@
         .nav-arrow { width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 20px solid var(--accent-color); filter: drop-shadow(0 0 5px rgba(0,0,0,0.5)); transition: transform 0.3s ease; }
         .nav-arrow-container { display: flex; justify-content: center; align-items: center; width: 40px; height: 40px; background: rgba(15, 23, 42, 0.5); border-radius: 50%; border: 2px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
         
-        /* LAYERS */
         #login-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.98); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(10px); transition: opacity 0.5s; }
-        
-        /* Calc overlay caché par défaut */
         #calc-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.98); z-index: 9000; display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        #calc-overlay.flex { display: flex !important; }
-
         #app-modal { position: fixed; inset: 0; z-index: 9500; display: none; backdrop-filter: blur(5px); background: rgba(15, 23, 42, 0.9); justify-content: center; align-items: center; }
         #app-modal.flex { display: flex; }
-
-        /* ALERTE BATTERIE */
         #battery-alert-modal { position: fixed; inset: 0; z-index: 9600; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
 
         .pin-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid #334155; transition: all 0.2s; }
@@ -56,7 +49,6 @@
         
         .calc-btn { width: 100%; height: 50px; border-radius: 12px; border: 1px solid #334155; font-size: 20px; font-weight: bold; background: rgba(30, 41, 59, 0.6); color: white; }
         .calc-btn:active { background: var(--accent-color); color: #0f172a; }
-        
         #login-error { transition: opacity 0.3s; opacity: 0; }
 
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
@@ -78,8 +70,6 @@
 </head>
 <body onclick="requestWakeLock()"> 
 
-    <input type="file" id="camera-trigger" accept="image/*" capture="environment" class="hidden">
-
     <div id="battery-alert-modal">
         <div class="glass-panel p-6 rounded-2xl w-3/4 max-w-sm border border-red-500 shadow-2xl text-center">
             <i class="fa-solid fa-triangle-exclamation text-red-500 text-4xl mb-4 animate-pulse"></i>
@@ -92,7 +82,7 @@
     <div id="login-overlay">
         <div class="mb-8 flex flex-col items-center">
             <i class="fa-solid fa-crown text-4xl text-accent mb-4"></i>
-            <h2 class="text-white font-bold text-xl uppercase tracking-widest">Ultimate V42</h2>
+            <h2 class="text-white font-bold text-xl uppercase tracking-widest">Ultimate V43</h2>
             <p class="text-slate-500 text-xs mt-1">Code PIN requis</p>
             <p id="login-error" class="text-red-500 text-xs font-bold mt-2">Code Incorrect</p>
         </div>
@@ -143,8 +133,7 @@
             <label class="block text-xs text-slate-400 mb-1">Type d'application</label>
             <select id="app-select" onchange="prefillApp()" class="w-full bg-slate-950 border border-slate-700 rounded p-3 text-white mb-3 outline-none focus:border-accent">
                 <option value="custom">-- Choisir --</option>
-                <option value="internal_cam|Appareil Photo|internal_cam|fa-solid fa-camera|#ffffff">Appareil Photo</option>
-                <option value="internal_calc|Calculatrice|internal_calc|fa-solid fa-calculator|#fbbf24">Calculatrice</option>
+                <option value="sys_calc|Calculatrice|sys_calc|fa-solid fa-calculator|#fbbf24">Calculatrice (Interne)</option>
                 <option value="spotify|Spotify|spotify:|fa-brands fa-spotify|#1DB954">Spotify</option>
                 <option value="deezer|Deezer|deezer:|fa-brands fa-deezer|#a255ff">Deezer</option>
                 <option value="waze|Waze|https://waze.com/ul|fa-brands fa-waze|#3b82f6">Waze</option>
@@ -166,7 +155,7 @@
     </div>
 
     <nav class="glass-panel sticky top-0 z-50 border-b border-slate-700/50 pt-safe-top h-16 flex-none flex justify-between items-center px-4">
-        <div class="flex items-center gap-2 text-slate-500 z-10 w-20"><i class="fa-solid fa-bolt text-accent"></i> <span class="text-[10px] font-bold uppercase tracking-wider">V42</span></div>
+        <div class="flex items-center gap-2 text-slate-500 z-10 w-20"><i class="fa-solid fa-bolt text-accent"></i> <span class="text-[10px] font-bold uppercase tracking-wider">V43</span></div>
         <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center gap-3"><div class="text-3xl font-black text-white digital-clock font-mono" id="clock-display">--:--</div></div>
         <div class="flex items-center justify-end gap-3 z-10 w-auto">
             <div id="top-weather" class="flex items-center gap-2 text-xs font-bold text-slate-300"><span class="text-[9px] opacity-50">GPS?</span></div>
@@ -257,11 +246,6 @@
             <div class="glass-panel rounded-xl p-2 border border-slate-600 flex-none shadow-lg mt-1 relative">
                 <div class="grid grid-cols-4 gap-2" id="shortcut-grid-main"></div>
                 <button onclick="toggleEditMode('main')" id="edit-mode-btn-main" class="absolute top-1 right-1 text-[8px] text-slate-600 hover:text-white p-1"><i class="fa-solid fa-pen"></i></button>
-            </div>
-
-            <div class="glass-panel rounded-xl p-2 border border-slate-600 flex-none shadow-lg mt-1 relative">
-                <div class="grid grid-cols-4 gap-2" id="shortcut-grid-mini"></div>
-                <button onclick="toggleEditMode('mini')" id="edit-mode-btn-mini" class="absolute top-1 right-1 text-[8px] text-slate-600 hover:text-white p-1"><i class="fa-solid fa-pen"></i></button>
             </div>
 
             <div class="glass-panel rounded-xl p-3 flex flex-col h-auto mb-20 mt-1 overflow-visible">
@@ -412,6 +396,14 @@
                 if(d) {
                     const loaded = JSON.parse(d);
                     state = { ...state, ...loaded };
+                    
+                    // --- CLEANUP CORRUPTED SHORTCUTS ---
+                    if (state.shortcutsMain) {
+                        state.shortcutsMain = state.shortcutsMain.map(s => 
+                            (s && (s.url.includes('camera') || s.url.includes('cam_'))) ? null : s
+                        );
+                    }
+                    
                     if(!state.maintenance || typeof state.maintenance !== 'object') {
                         state.maintenance = {
                             general: { last: loaded.maintenanceKm || 0, interval: loaded.maintInterval || 500 },
@@ -421,7 +413,6 @@
                     }
                 } 
                 if(!state.shortcutsMain) state.shortcutsMain = [null,null,null,null];
-                if(!state.shortcutsMini) state.shortcutsMini = [null,null,null,null];
                 if(isNaN(state.tripA)) state.tripA = 0; if(isNaN(state.tripB)) state.tripB = 0;
                 if(typeof state.batteryCurrent === 'undefined' || isNaN(state.batteryCurrent)) state.batteryCurrent = state.batteryMax;
                 
@@ -445,7 +436,7 @@
         function resetBatteryToFull() { 
             if(confirm('Recharge complète confirmée ?')) { 
                 state.batteryCurrent = state.batteryMax; 
-                state.lowBatteryWarned = false; // Reset warning flag
+                state.lowBatteryWarned = false; 
                 saveData(); updateUI(); 
             } 
         }
@@ -462,23 +453,22 @@
             document.getElementById('calc-display').innerText = calcExp || "0";
         }
 
-        // --- APP LAUNCHER ENGINE (UNIVERSAL FIX) ---
+        // --- APP LAUNCHER ENGINE (SIMPLE & ROBUST) ---
         function launchApp(url) {
             if(!url) return;
-            // Check for keywords instead of exact string (Handles all versions)
-            if(url.indexOf('cam') > -1 || url.indexOf('photo') > -1) { 
-                document.getElementById('camera-trigger').click(); 
-                return; 
+            // Internal Calc Check
+            if(url === 'sys_calc' || url.includes('calc')) { openCalc(); return; }
+            
+            // Standard Web Open
+            if(url.startsWith('http')) { 
+                window.open(url, '_blank'); 
+            } else { 
+                // URI schemes (spotify:, tel:, etc)
+                window.location.href = url; 
             }
-            if(url.indexOf('calc') > -1) { 
-                openCalc(); 
-                return; 
-            }
-            // Standard links
-            if(url.startsWith('http')) { window.open(url, '_blank'); } else { window.location.href = url; }
         }
 
-        // --- METEO & NAV (COCKPIT FIX) ---
+        // --- METEO & NAV ---
         async function fetchWeather(lat, lon) {
             try {
                 const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,precipitation_probability&forecast_days=1`);
@@ -524,14 +514,13 @@
             polyline = L.polyline([], {color: state.themeColor, weight:5}).addTo(map);
             historyPolyline = L.polyline([], {color:'#06b6d4', weight:5, dashArray: '10, 10'}).addTo(map);
             
-            // AUTO-INIT GPS & WEATHER
             if(navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(p => {
                     const lat = p.coords.latitude;
                     const lon = p.coords.longitude;
                     map.setView([lat, lon], 16);
                     marker.setLatLng([lat, lon]);
-                    fetchWeather(lat, lon); // Auto weather on start
+                    fetchWeather(lat, lon); 
                 });
             }
         }
@@ -559,6 +548,8 @@
                     marker.setLatLng([lat,lon]);
                     const arrow = document.getElementById('gps-arrow'); if(arrow) arrow.style.transform = `rotate(${pos.coords.heading||0}deg)`;
                     map.setView([lat,lon]);
+                    
+                    if(Math.random() < 0.05) fetchWeather(lat, lon); 
 
                     if(isTimerRunning) {
                         if(spd > currentMaxSpeed) currentMaxSpeed = spd;
@@ -605,11 +596,8 @@
             if(isTimerRunning) toggleTimer(); 
             const dist = parseFloat(document.getElementById('input-dist').value); if(!dist || dist<=0) return alert("0 km ?"); 
             state.odo += dist; state.tripA += dist; state.tripB += dist;
-            
-            // FIX: Autonomie baisse quand on SAVE
             state.batteryCurrent = (state.batteryCurrent || 40) - dist;
             if(state.batteryCurrent < 0) state.batteryCurrent = 0;
-
             state.logs.unshift({id: Date.now(), title: document.getElementById('input-title').value||"Trajet", date: document.getElementById('input-date').value, dist: dist.toFixed(1), max: currentMaxSpeed, track: [...trackPoints]}); 
             saveData(); updateUI(); 
             document.getElementById('input-dist').value = ""; document.getElementById('timer-display').innerText="00:00:00"; document.getElementById('hud-dist').innerText="0.0";
@@ -639,7 +627,7 @@
         function resetMultiMaint(key) { if(confirm('Reset '+key+'?')) { state.maintenance[key].last = state.odo; saveData(); updateUI(); } }
         function setMaintInterval(key) { const v=prompt("Intervalle:"); if(v&&!isNaN(v)){ state.maintenance[key].interval=parseFloat(v); saveData(); updateUI(); } }
 
-        // --- CHART ---
+        // --- CHART (DIST / ALT) ---
         let chartInstance = null; let chartMode = 'dist'; 
         function setChartMode(m) { chartMode = m; document.getElementById('btn-chart-dist').className = m==='dist' ? "text-[9px] px-2 py-0.5 rounded text-slate-300 bg-slate-600" : "text-[9px] px-2 py-0.5 rounded text-slate-500"; document.getElementById('btn-chart-alt').className = m==='alt' ? "text-[9px] px-2 py-0.5 rounded text-slate-300 bg-slate-600" : "text-[9px] px-2 py-0.5 rounded text-slate-500"; renderChart(); }
         function renderChart() {
@@ -659,13 +647,14 @@
             chartInstance = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ label: chartMode, data: data, borderColor: color, backgroundColor: color+'33', borderWidth: 2, tension: 0.4, fill: true, pointRadius: chartMode==='alt'?0:3 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#94a3b8', font: {size:8} } }, x: { display: true, grid: { display: false }, ticks: { color: '#94a3b8', font: {size:8} } } } } });
         }
 
-        // --- SHORTCUTS ENGINE (UNIVERSAL FIX) ---
+        // --- SHORTCUTS ENGINE (SIMPLE & ROBUST) ---
         let editTarget = null; let currentSlotIndex = -1;
         function renderShortcuts(type) { 
             const grid = document.getElementById(`shortcut-grid-${type}`); if(!grid) return; grid.innerHTML = '';
-            const list = type === 'main' ? state.shortcutsMain : state.shortcutsMini;
+            const list = type === 'main' ? state.shortcutsMain : []; // IGNORE MINI
             const isEditing = (editTarget === type);
-            const heightClass = 'h-14'; 
+            // H-20 = Plus grand et lisible
+            const heightClass = 'h-20'; 
 
             list.forEach((app, index) => {
                 const btn = document.createElement('div');
@@ -673,39 +662,23 @@
                     let action = `launchApp('${app.url}')`;
                     if(isEditing) action = `openAppModal('${type}', ${index})`;
 
-                    btn.className = `relative ${heightClass} rounded-xl flex flex-col items-center justify-center gap-0.5 transition active:scale-95 cursor-pointer overflow-hidden border ${isEditing ? 'border-yellow-500 bg-yellow-500/10 animate-pulse' : 'border-slate-700 bg-slate-800/50 hover:bg-slate-700'}`;
+                    btn.className = `relative ${heightClass} rounded-xl flex flex-col items-center justify-center gap-1 transition active:scale-95 cursor-pointer overflow-hidden border ${isEditing ? 'border-yellow-500 bg-yellow-500/10 animate-pulse' : 'border-slate-700 bg-slate-800/50 hover:bg-slate-700'}`;
                     btn.setAttribute('onclick', action);
                     btn.style.borderColor = isEditing ? '#eab308' : (app.color + '40');
-                    btn.innerHTML = `<i class="${app.icon} text-lg mb-0.5" style="color: ${app.color}"></i><span class="text-[8px] font-bold text-slate-300 truncate w-full text-center px-1">${app.name}</span>${isEditing ? '<div class="absolute top-0 right-0 text-[7px] text-yellow-500 p-0.5"><i class="fa-solid fa-pencil"></i></div>' : ''}`;
+                    btn.innerHTML = `<i class="${app.icon} text-2xl mb-1" style="color: ${app.color}"></i><span class="text-[9px] font-bold text-slate-300 truncate w-full text-center px-1">${app.name}</span>${isEditing ? '<div class="absolute top-0 right-0 text-[8px] text-yellow-500 p-1"><i class="fa-solid fa-pencil"></i></div>' : ''}`;
                 } else {
                     btn.className = `${heightClass} rounded-xl border border-dashed border-slate-700 flex items-center justify-center text-slate-600 hover:text-accent hover:border-accent transition cursor-pointer active:scale-95 bg-slate-900/30`;
                     btn.onclick = () => openAppModal(type, index);
-                    btn.innerHTML = `<i class="fa-solid fa-plus text-sm"></i>`;
+                    btn.innerHTML = `<i class="fa-solid fa-plus text-lg"></i>`;
                 }
                 grid.appendChild(btn);
             });
         }
 
-        // --- APP LAUNCHER ENGINE (UNIVERSAL FIX) ---
-        function launchApp(url) {
-            if(!url) return;
-            // CHECK KEYWORDS (Handles ALL versions of configs)
-            if(url.indexOf('cam') > -1 || url.indexOf('photo') > -1) { 
-                document.getElementById('camera-trigger').click(); 
-                return; 
-            }
-            if(url.indexOf('calc') > -1) { 
-                openCalc(); 
-                return; 
-            }
-            // Standard links
-            if(url.startsWith('http')) { window.open(url, '_blank'); } else { window.location.href = url; }
-        }
-
         function toggleEditMode(type) { if(editTarget && editTarget !== type) toggleEditMode(editTarget); editTarget = (editTarget === type) ? null : type; renderShortcuts(type); }
         function openAppModal(type, index) {
             currentSlotIndex = index; window.modalTargetType = type; const modal = document.getElementById('app-modal');
-            const list = type === 'main' ? state.shortcutsMain : state.shortcutsMini; const existing = list[index]; document.getElementById('app-select').value = 'custom';
+            const list = type === 'main' ? state.shortcutsMain : []; const existing = list[index]; document.getElementById('app-select').value = 'custom';
             if (existing) { document.getElementById('app-name').value = existing.name; document.getElementById('app-url').value = existing.url; document.getElementById('app-icon').value = existing.icon; document.getElementById('app-color').value = existing.color; document.getElementById('btn-delete-app').classList.remove('hidden'); } 
             else { document.getElementById('app-name').value = ""; document.getElementById('app-url').value = ""; document.getElementById('app-icon').value = "fa-solid fa-cube"; document.getElementById('app-color').value = "#ffffff"; document.getElementById('btn-delete-app').classList.add('hidden'); }
             modal.classList.add('flex'); modal.classList.remove('hidden');
@@ -717,10 +690,10 @@
             const icon = document.getElementById('app-icon').value; const color = document.getElementById('app-color').value;
             if (!name || !url) return alert("Nom et lien requis");
             const type = window.modalTargetType;
-            if(type === 'main') state.shortcutsMain[currentSlotIndex] = { name, url, icon, color }; else state.shortcutsMini[currentSlotIndex] = { name, url, icon, color };
+            if(type === 'main') state.shortcutsMain[currentSlotIndex] = { name, url, icon, color };
             saveData(); renderShortcuts(type); closeAppModal(); if(editTarget === type) toggleEditMode(type); 
         }
-        function deleteCurrentShortcut() { if(confirm('Supprimer ?')) { const type = window.modalTargetType; if(type === 'main') state.shortcutsMain[currentSlotIndex] = null; else state.shortcutsMini[currentSlotIndex] = null; saveData(); renderShortcuts(type); closeAppModal(); } }
+        function deleteCurrentShortcut() { if(confirm('Supprimer ?')) { const type = window.modalTargetType; if(type === 'main') state.shortcutsMain[currentSlotIndex] = null; saveData(); renderShortcuts(type); closeAppModal(); } }
 
         function manualUpdateODO(v) {
             const newVal = parseFloat(v);
@@ -740,19 +713,13 @@
         function exportJSON() { const a=document.createElement('a'); a.href="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(state)); a.download="backup.json"; a.click(); }
         function importJSON(i) { const r=new FileReader(); r.onload=e=>{ state={...state, ...JSON.parse(e.target.result)}; saveData(); updateUI(); alert("OK"); }; r.readAsText(i.files[0]); }
         function deleteLog(id) { if(confirm('Supprimer ?')) { const i=state.logs.findIndex(l=>l.id===id); if(i>-1) { state.odo-=parseFloat(state.logs[i].dist); state.logs.splice(i,1); saveData(); updateUI(); } } }
-        
         function switchTab(id) { 
             document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active')); document.getElementById('tab-'+id).classList.add('active'); 
             document.querySelectorAll('.nav-btn').forEach(e=>e.classList.remove('active')); document.getElementById('nav-'+id).classList.add('active'); 
             if(id==='map') {
                 setTimeout(()=>{ 
                     map.invalidateSize(); 
-                    // RE-CENTER ON SWITCH
-                    if(marker) {
-                        const ll = marker.getLatLng();
-                        if(ll.lat !== 0) map.setView(ll, 16);
-                        else centerMap(); 
-                    }
+                    if(marker) { const ll = marker.getLatLng(); if(ll.lat !== 0) map.setView(ll, 16); else centerMap(); }
                 }, 200); 
             }
             if(id==='garage') renderChart(); 
@@ -828,7 +795,6 @@
                 } 
             }
             renderShortcuts('main');
-            renderShortcuts('mini');
             if(document.getElementById('tab-garage').classList.contains('active')) renderChart();
             document.getElementById('battery-max-range').value = state.batteryMax || 40;
         }
