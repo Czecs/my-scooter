@@ -11,7 +11,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2641/2641271.png">
     
-    <title>ScooterMaster V31</title>
+    <title>ScooterMaster V32</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -36,11 +36,9 @@
         .nav-arrow { width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 20px solid var(--accent-color); filter: drop-shadow(0 0 5px rgba(0,0,0,0.5)); transition: transform 0.3s ease; }
         .nav-arrow-container { display: flex; justify-content: center; align-items: center; width: 40px; height: 40px; background: rgba(15, 23, 42, 0.5); border-radius: 50%; border: 2px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
         
-        /* LAYERS */
         #login-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.98); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(10px); transition: opacity 0.5s; }
         #calc-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.95); z-index: 9000; display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        #calc-overlay.flex { display: flex; } /* Force display flex when active */
-
+        
         .pin-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid #334155; transition: all 0.2s; }
         .pin-dot.filled { background: var(--accent-color); border-color: var(--accent-color); box-shadow: 0 0 10px var(--accent-color); }
         .numpad-btn { width: 60px; height: 60px; border-radius: 50%; border: 1px solid #334155; color: white; font-size: 24px; display: flex; items-center; justify-content: center; transition: all 0.1s; background: rgba(30, 41, 59, 0.5); }
@@ -73,7 +71,7 @@
     <div id="login-overlay">
         <div class="mb-8 flex flex-col items-center">
             <i class="fa-solid fa-crown text-4xl text-accent mb-4"></i>
-            <h2 class="text-white font-bold text-xl uppercase tracking-widest">Ultimate V31</h2>
+            <h2 class="text-white font-bold text-xl uppercase tracking-widest">Ultimate V32</h2>
             <p class="text-slate-500 text-xs mt-1">Code PIN requis</p>
             <p id="login-error" class="text-red-500 text-xs font-bold mt-2">Code Incorrect</p>
         </div>
@@ -86,7 +84,7 @@
         </div>
     </div>
 
-    <div id="calc-overlay" style="display: none;">
+    <div id="calc-overlay">
         <div class="glass-panel p-4 rounded-2xl w-full max-w-xs border border-slate-600">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-white font-bold text-sm"><i class="fa-solid fa-calculator text-accent mr-2"></i>Calculatrice</h3>
@@ -147,7 +145,7 @@
     </div>
 
     <nav class="glass-panel sticky top-0 z-50 border-b border-slate-700/50 pt-safe-top h-16 flex-none flex justify-between items-center px-4">
-        <div class="flex items-center gap-2 text-slate-500 z-10 w-20"><i class="fa-solid fa-bolt text-accent"></i> <span class="text-[10px] font-bold uppercase tracking-wider">V31</span></div>
+        <div class="flex items-center gap-2 text-slate-500 z-10 w-20"><i class="fa-solid fa-bolt text-accent"></i> <span class="text-[10px] font-bold uppercase tracking-wider">V32</span></div>
         <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center gap-3"><div class="text-3xl font-black text-white digital-clock font-mono" id="clock-display">--:--</div></div>
         <div class="flex items-center justify-end gap-3 z-10 w-auto">
             <div id="top-weather" class="flex items-center gap-2 text-xs font-bold text-slate-300"><span class="text-[9px] opacity-50">GPS?</span></div>
@@ -182,20 +180,61 @@
                 </div>
             </div>
 
-            <div class="glass-panel rounded-xl p-3 border border-slate-600 flex-none flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-battery-half text-2xl text-accent"></i>
-                    <div class="flex flex-col">
-                        <span class="text-[9px] text-slate-400 uppercase font-bold">Autonomie Estimée</span>
-                        <div class="text-sm font-bold text-white">Reste <span id="batt-range-dash" class="text-accent text-lg">0</span> km</div>
+            <div class="grid grid-cols-2 gap-2 flex-none h-16">
+                <div class="glass-panel rounded-xl p-2 flex flex-col justify-center bg-slate-800/40 border-l-2 border-l-slate-600">
+                    <span class="text-[9px] text-slate-400 uppercase font-bold flex items-center gap-1"><i class="fa-solid fa-battery-half text-accent"></i> Autonomie</span>
+                    <div class="flex items-baseline mt-1">
+                        <span id="batt-range-dash" class="text-2xl font-bold text-white font-mono leading-none">0</span>
+                        <span class="text-[10px] text-slate-400 ml-1">km</span>
                     </div>
                 </div>
-                <div class="text-[8px] text-slate-500 italic max-w-[100px] text-right">Basé sur GPS et Max (Garage)</div>
+                
+                <div class="glass-panel rounded-xl p-1 grid grid-cols-2 gap-1 bg-slate-800/20">
+                    <button onclick="openNav('home')" class="bg-slate-700/50 hover:bg-slate-600 text-white rounded flex flex-col items-center justify-center transition active:scale-95">
+                        <i class="fa-solid fa-house text-accent text-xs"></i><span class="text-[7px] font-bold mt-0.5">Maison</span>
+                    </button>
+                    <button onclick="openNav('work')" class="bg-slate-700/50 hover:bg-slate-600 text-white rounded flex flex-col items-center justify-center transition active:scale-95">
+                        <i class="fa-solid fa-briefcase text-warning text-xs"></i><span class="text-[7px] font-bold mt-0.5">Travail</span>
+                    </button>
+                </div>
             </div>
 
             <div class="grid grid-cols-2 gap-2 flex-none">
-                <div class="glass-panel rounded-xl p-2 flex flex-col items-center justify-center bg-slate-800/60 border-l-2 border-l-accent"><span class="text-slate-500 text-[9px] font-bold uppercase">Vitesse</span><div class="flex items-baseline"><span id="dash-speed" class="text-3xl font-bold text-white dashboard-value font-mono leading-none">0</span><span class="text-[10px] text-accent ml-1">km/h</span></div></div>
-                <div class="glass-panel rounded-xl p-2 flex flex-col items-center justify-center bg-slate-800/60 border-r-2 border-r-accent"><span class="text-slate-500 text-[9px] font-bold uppercase">Session</span><div class="flex items-baseline"><span id="dash-dist" class="text-3xl font-bold text-white dashboard-value font-mono leading-none">0.0</span><span class="text-[10px] text-accent ml-1">km</span></div></div>
+                <div class="glass-panel rounded-xl p-2 flex flex-col items-center justify-center bg-slate-800/60 border-l-2 border-l-accent">
+                    <span class="text-slate-500 text-[9px] font-bold uppercase">Vitesse</span>
+                    <div class="flex items-baseline">
+                        <span id="dash-speed" class="text-3xl font-bold text-white dashboard-value font-mono leading-none">0</span>
+                        <span class="text-[10px] text-accent ml-1">km/h</span>
+                    </div>
+                </div>
+                <div class="glass-panel rounded-xl p-2 flex flex-col items-center justify-center bg-slate-800/60 border-r-2 border-r-accent">
+                    <span class="text-slate-500 text-[9px] font-bold uppercase">Session</span>
+                    <div class="flex items-baseline">
+                        <span id="dash-dist" class="text-3xl font-bold text-white dashboard-value font-mono leading-none">0.0</span>
+                        <span class="text-[10px] text-accent ml-1">km</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-xl p-3 border-t border-slate-600 shadow-lg flex-none mt-1">
+                <div class="flex gap-2 mb-3 h-12">
+                    <div class="w-1/3 flex flex-col justify-center items-center bg-slate-950/40 rounded-lg border border-slate-700 relative px-1">
+                        <div class="flex justify-between items-center w-full px-1 mb-1"><span class="text-[10px] font-bold text-slate-400">GPS</span><span id="gps-status" class="text-[8px] text-slate-500">OFF</span></div>
+                        <label class="relative inline-flex items-center cursor-pointer scale-90"><input type="checkbox" id="gps-toggle" class="sr-only peer" onchange="toggleGPSMode()"><div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:bg-accent after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div></label>
+                    </div>
+                    <button id="btn-timer" onclick="toggleTimer()" class="flex-grow flex items-center justify-center gap-3 rounded-lg font-black text-lg transition-all bg-accent text-slate-900 hover:bg-white shadow-md active:scale-95"><i class="fa-solid fa-play"></i> <span id="timer-display">00:00:00</span></button>
+                </div>
+                <div class="space-y-2 bg-slate-800/40 p-2 rounded-lg border border-white/5">
+                    <input type="text" id="input-title" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-white focus:border-accent outline-none text-xs" placeholder="Nom du trajet (ex: Balade)">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="relative"><input type="number" id="input-dist" step="0.1" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-white font-mono font-bold focus:border-accent outline-none text-sm" placeholder="0.0"><span class="absolute right-3 top-1.5 text-xs text-slate-500 font-bold">km</span></div>
+                        <input type="date" id="input-date" class="w-full bg-slate-900 border border-slate-700 rounded px-1 py-1.5 text-xs text-slate-300 outline-none text-center">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 mt-1">
+                        <button onclick="addLog()" class="bg-slate-700 hover:bg-emerald-600 text-white py-2 rounded-lg font-bold transition active:scale-95 shadow-lg text-[10px] uppercase tracking-wide"><i class="fa-solid fa-floppy-disk mr-2"></i> Save</button>
+                        <button onclick="exportCurrentGPX()" id="btn-gpx" disabled class="bg-slate-800 border border-slate-600 text-slate-400 py-2 rounded-lg font-bold transition active:scale-95 shadow-lg text-[10px] uppercase tracking-wide disabled:opacity-50"><i class="fa-solid fa-route mr-2"></i> GPX</button>
+                    </div>
+                </div>
             </div>
 
             <div class="glass-panel rounded-xl p-2 border border-slate-600 flex-none shadow-lg mt-1 relative">
@@ -206,35 +245,6 @@
             <div class="glass-panel rounded-xl p-2 border border-slate-600 flex-none shadow-lg mt-1 relative">
                 <div class="grid grid-cols-4 gap-2" id="shortcut-grid-mini"></div>
                 <button onclick="toggleEditMode('mini')" id="edit-mode-btn-mini" class="absolute top-1 right-1 text-[8px] text-slate-600 hover:text-white p-1"><i class="fa-solid fa-pen"></i></button>
-            </div>
-
-            <div class="glass-panel rounded-xl p-3 border border-slate-600 flex-none mt-1">
-                <h3 class="text-slate-400 text-[10px] uppercase font-bold mb-2 flex justify-between">Navigation Rapide <i class="fa-brands fa-waze text-blue-400"></i></h3>
-                <div class="grid grid-cols-2 gap-2">
-                    <button onclick="openNav('home')" class="bg-slate-700 hover:bg-slate-600 text-white py-2 rounded flex items-center justify-center gap-2 transition active:scale-95"><i class="fa-solid fa-house text-accent text-xs"></i> <span class="text-xs font-bold">Maison</span></button>
-                    <button onclick="openNav('work')" class="bg-slate-700 hover:bg-slate-600 text-white py-2 rounded flex items-center justify-center gap-2 transition active:scale-95"><i class="fa-solid fa-briefcase text-warning text-xs"></i> <span class="text-xs font-bold">Travail</span></button>
-                </div>
-            </div>
-            
-            <div class="glass-panel rounded-xl p-4 border-t border-slate-600 shadow-lg flex-none mt-1">
-                <div class="flex gap-2 mb-3 h-14">
-                    <div class="w-1/3 flex flex-col justify-center items-center bg-slate-950/40 rounded-lg border border-slate-700 relative px-1">
-                        <div class="flex justify-between items-center w-full px-1 mb-1"><span class="text-[10px] font-bold text-slate-400">GPS</span><span id="gps-status" class="text-[8px] text-slate-500">OFF</span></div>
-                        <label class="relative inline-flex items-center cursor-pointer scale-90"><input type="checkbox" id="gps-toggle" class="sr-only peer" onchange="toggleGPSMode()"><div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:bg-accent after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div></label>
-                    </div>
-                    <button id="btn-timer" onclick="toggleTimer()" class="flex-grow flex items-center justify-center gap-3 rounded-lg font-black text-lg transition-all bg-accent text-slate-900 hover:bg-white shadow-md active:scale-95"><i class="fa-solid fa-play"></i> <span id="timer-display">00:00:00</span></button>
-                </div>
-                <div class="space-y-2 bg-slate-800/40 p-3 rounded-lg border border-white/5">
-                    <input type="text" id="input-title" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-white focus:border-accent outline-none text-sm" placeholder="Nom du trajet (ex: Balade)">
-                    <div class="grid grid-cols-2 gap-2">
-                        <div class="relative"><input type="number" id="input-dist" step="0.1" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-white font-mono font-bold focus:border-accent outline-none text-base" placeholder="0.0"><span class="absolute right-3 top-2.5 text-xs text-slate-500 font-bold">km</span></div>
-                        <input type="date" id="input-date" class="w-full bg-slate-900 border border-slate-700 rounded px-1 py-2 text-xs text-slate-300 outline-none text-center">
-                    </div>
-                    <div class="grid grid-cols-2 gap-2 mt-2">
-                        <button onclick="addLog()" class="bg-slate-700 hover:bg-emerald-600 text-white py-3 rounded-lg font-bold transition active:scale-95 shadow-lg text-xs uppercase tracking-wide"><i class="fa-solid fa-floppy-disk mr-2"></i> Save</button>
-                        <button onclick="exportCurrentGPX()" id="btn-gpx" disabled class="bg-slate-800 border border-slate-600 text-slate-400 py-3 rounded-lg font-bold transition active:scale-95 shadow-lg text-xs uppercase tracking-wide disabled:opacity-50"><i class="fa-solid fa-route mr-2"></i> GPX</button>
-                    </div>
-                </div>
             </div>
 
             <div class="glass-panel rounded-xl p-3 flex flex-col h-auto mb-20 mt-1 overflow-visible">
