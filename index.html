@@ -11,7 +11,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2641/2641271.png">
     
-    <title>ScooterMaster V52</title>
+    <title>ScooterMaster V53</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -109,11 +109,14 @@
     <div id="login-overlay">
         <div class="mb-8 flex flex-col items-center">
             <i class="fa-solid fa-crown text-4xl text-accent mb-4"></i>
-            <h2 class="text-white font-bold text-xl uppercase tracking-widest">Ultimate V52</h2>
-            <p class="text-slate-500 text-xs mt-1">Code PIN requis</p>
+            <h2 class="text-white font-bold text-xl uppercase tracking-widest">Ultimate V53</h2>
+            <p class="text-slate-500 text-xs mt-1">Code PIN requis (6 chiffres)</p>
             <p id="login-error" class="text-red-500 text-xs font-bold mt-2">Code Incorrect</p>
         </div>
-        <div class="flex gap-4 mb-8"><div class="pin-dot" id="dot-1"></div><div class="pin-dot" id="dot-2"></div><div class="pin-dot" id="dot-3"></div><div class="pin-dot" id="dot-4"></div></div>
+        <div class="flex gap-3 mb-8">
+            <div class="pin-dot" id="dot-1"></div><div class="pin-dot" id="dot-2"></div><div class="pin-dot" id="dot-3"></div>
+            <div class="pin-dot" id="dot-4"></div><div class="pin-dot" id="dot-5"></div><div class="pin-dot" id="dot-6"></div>
+        </div>
         <div class="grid grid-cols-3 gap-6">
             <button class="numpad-btn" onclick="typePin(1)">1</button><button class="numpad-btn" onclick="typePin(2)">2</button><button class="numpad-btn" onclick="typePin(3)">3</button>
             <button class="numpad-btn" onclick="typePin(4)">4</button><button class="numpad-btn" onclick="typePin(5)">5</button><button class="numpad-btn" onclick="typePin(6)">6</button>
@@ -203,7 +206,7 @@
     </div>
 
     <nav class="glass-panel sticky top-0 z-50 border-b border-slate-700/50 pt-safe-top h-16 flex-none flex justify-between items-center px-4">
-        <div class="flex items-center gap-2 text-slate-500 z-10 w-20"><i class="fa-solid fa-bolt text-accent"></i> <span class="text-[10px] font-bold uppercase tracking-wider">V52</span></div>
+        <div class="flex items-center gap-2 text-slate-500 z-10 w-20"><i class="fa-solid fa-bolt text-accent"></i> <span class="text-[10px] font-bold uppercase tracking-wider">V53</span></div>
         <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center gap-3"><div class="text-3xl font-black text-white digital-clock font-mono" id="clock-display">--:--</div></div>
         <div class="flex items-center justify-end gap-3 z-10 w-auto">
             <div id="top-weather" class="flex items-center gap-2 text-lg font-bold text-slate-300"><span class="text-sm opacity-50">GPS?</span></div>
@@ -428,30 +431,57 @@
         // HASH FUNCTION FOR SECURITY (Simple DJB2 variant)
         const hashCode = s => s.split('').reduce((a,b)=>{a=((a<<5)-a)+b.charCodeAt(0);return a&a},0);
         
-        let savedPinHash = localStorage.getItem('scooter_pin_hash') || "1537214"; // Default Hash for "0000"
+        // --- DEFAULT PIN HANDLING ---
+        // Force reset of pin storage to use the new 6-digit default
+        const DEFAULT_PIN = "010779";
+        const DEFAULT_HASH = hashCode(DEFAULT_PIN);
+        
+        // Check if we already have a V53 hash saved, if not, set it
+        let savedPinHash = localStorage.getItem('scooter_pin_hash_v53');
+        if (!savedPinHash) {
+            savedPinHash = DEFAULT_HASH;
+            localStorage.setItem('scooter_pin_hash_v53', savedPinHash);
+        }
+
         let currentPin = "";
 
-        function typePin(d) { if(currentPin.length<4){ currentPin+=d; updatePinDots(); if(currentPin.length===4) checkPin(); } }
+        function typePin(d) { 
+            if(currentPin.length < 6) {
+                currentPin += d; 
+                updatePinDots(); 
+                if(currentPin.length === 6) {
+                    setTimeout(checkPin, 50); // Small delay for UX
+                }
+            } 
+        }
+        
         function clearPin() { currentPin=""; updatePinDots(); document.getElementById('login-error').classList.add('opacity-0'); }
-        function updatePinDots() { for(let i=1;i<=4;i++) document.getElementById('dot-'+i).classList.toggle('filled', i<=currentPin.length); }
+        function updatePinDots() { 
+            for(let i=1;i<=6;i++) {
+                const dot = document.getElementById('dot-'+i);
+                if(dot) dot.classList.toggle('filled', i<=currentPin.length); 
+            }
+        }
         
         function checkPin() { 
             if(hashCode(currentPin) == savedPinHash) {
                 document.getElementById('login-overlay').style.display='none'; 
             } else { 
                 document.getElementById('login-error').classList.remove('opacity-0'); 
-                setTimeout(clearPin,500); 
+                setTimeout(clearPin, 500); 
             } 
         }
         
         function changeUserPin() { 
             const n = document.getElementById('new-pin-input').value; 
-            if(n.length===4 && confirm('Changer PIN?')) { 
+            if(n.length===6 && confirm('Changer PIN?')) { 
                 savedPinHash = hashCode(n);
-                localStorage.setItem('scooter_pin_hash', savedPinHash); 
+                localStorage.setItem('scooter_pin_hash_v53', savedPinHash); 
                 alert('OK'); 
                 document.getElementById('new-pin-input').value=""; 
-            } 
+            } else if (n.length !== 6) {
+                alert("Le code doit faire 6 chiffres");
+            }
         }
         
         // --- 2. DATA & STATE ---
@@ -468,10 +498,10 @@
                     const loaded = JSON.parse(d);
                     state = { ...state, ...loaded };
                     
-                    // --- NETTOYAGE LIENS WHATSAPP ---
+                    // --- CLEANUP CORRUPTED SHORTCUTS ---
                     if (state.shortcutsMain) {
                         state.shortcutsMain = state.shortcutsMain.map(s => 
-                            (s && (s.url.includes('whatsapp') || s.url.includes('wa.me'))) ? null : s
+                            (s && (s.url.includes('wa.me') || s.url.includes('whatsapp://'))) ? null : s
                         );
                     }
                     
@@ -527,8 +557,16 @@
         // --- APP LAUNCHER ENGINE (SIMPLE & ROBUST) ---
         function launchApp(url) {
             if(!url) return;
+            // Internal Calc Check
             if(url === 'sys_calc' || url.includes('calc')) { openCalc(); return; }
-            if(url.startsWith('http')) { window.open(url, '_blank'); } else { window.location.href = url; }
+            
+            // Standard Web Open (HTTPS)
+            if(url.startsWith('http')) { 
+                window.open(url, '_blank'); 
+            } else { 
+                // URI schemes fallback
+                window.location.href = url; 
+            }
         }
 
         // --- METEO & NAV ---
@@ -698,7 +736,7 @@
         function resetMultiMaint(key) { if(confirm('Reset '+key+'?')) { state.maintenance[key].last = state.odo; saveData(); updateUI(); } }
         function setMaintInterval(key) { const v=prompt("Intervalle:"); if(v&&!isNaN(v)){ state.maintenance[key].interval=parseFloat(v); saveData(); updateUI(); } }
 
-        // --- CHART ---
+        // --- CHART (DIST / ALT) ---
         let chartInstance = null; let chartMode = 'dist'; 
         function setChartMode(m) { chartMode = m; document.getElementById('btn-chart-dist').className = m==='dist' ? "text-[9px] px-2 py-0.5 rounded text-slate-300 bg-slate-600" : "text-[9px] px-2 py-0.5 rounded text-slate-500"; document.getElementById('btn-chart-alt').className = m==='alt' ? "text-[9px] px-2 py-0.5 rounded text-slate-300 bg-slate-600" : "text-[9px] px-2 py-0.5 rounded text-slate-500"; renderChart(); }
         function renderChart() {
@@ -722,17 +760,19 @@
         let editTarget = null; let currentSlotIndex = -1;
         function renderShortcuts(type) { 
             const grid = document.getElementById(`shortcut-grid-${type}`); if(!grid) return; grid.innerHTML = '';
-            const list = type === 'main' ? state.shortcutsMain : []; 
+            const list = type === 'main' ? state.shortcutsMain : []; // IGNORE MINI
             const isEditing = (editTarget === type);
             const heightClass = 'h-20'; 
 
             list.forEach((app, index) => {
                 const btn = document.createElement('div');
                 if (app) {
+                    // FIX: Ensure Name/Icon/Color are populated even if mis-saved
                     let displayIcon = app.icon || "fa-solid fa-cube";
                     let displayName = app.name || "App";
                     let displayColor = app.color || "#ffffff";
 
+                    // LOGIC EXECUTION
                     let action = `launchApp('${app.url}')`;
                     if(isEditing) action = `openAppModal('${type}', ${index})`;
 
@@ -758,6 +798,7 @@
             modal.classList.add('flex'); modal.classList.remove('hidden');
         }
         function closeAppModal() { document.getElementById('app-modal').classList.add('hidden'); document.getElementById('app-modal').classList.remove('flex'); }
+        // FIX: Ensure prefill uses correct 4-part split
         function prefillApp() { const val = document.getElementById('app-select').value; if (val === 'custom') return; const [name, url, icon, color] = val.split('|'); document.getElementById('app-name').value = name; document.getElementById('app-url').value = url; document.getElementById('app-icon').value = icon; document.getElementById('app-color').value = color; }
         
         function saveShortcut() {
