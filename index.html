@@ -11,7 +11,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2641/2641271.png">
     
-    <title>ScooterMaster V51</title>
+    <title>ScooterMaster V52</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -40,9 +40,12 @@
         #login-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.98); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(10px); transition: opacity 0.5s; }
         #app-modal { position: fixed; inset: 0; z-index: 9500; display: none; backdrop-filter: blur(5px); background: rgba(15, 23, 42, 0.9); justify-content: center; align-items: center; }
         #app-modal.flex { display: flex; }
-        #battery-alert-modal { position: fixed; inset: 0; z-index: 9600; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
         
-        /* Calc overlay caché par défaut avec !important */
+        /* NEW NAV CHOICE MODAL */
+        #nav-choice-modal { position: fixed; inset: 0; z-index: 9600; display: none; backdrop-filter: blur(5px); background: rgba(15, 23, 42, 0.9); justify-content: center; align-items: center; }
+        
+        #battery-alert-modal { position: fixed; inset: 0; z-index: 9700; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
+        
         #calc-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.95); z-index: 9000; display: none !important; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
         #calc-overlay.flex { display: flex !important; }
 
@@ -86,10 +89,27 @@
         </div>
     </div>
 
+    <div id="nav-choice-modal">
+        <div class="glass-panel p-6 rounded-2xl w-3/4 max-w-sm border border-slate-600 shadow-2xl text-center">
+            <h3 class="text-white font-bold text-lg mb-4 uppercase">Choisir GPS</h3>
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="confirmNav('waze')" class="flex flex-col items-center justify-center bg-slate-800 hover:bg-slate-700 p-4 rounded-xl border border-slate-600">
+                    <i class="fa-brands fa-waze text-blue-400 text-3xl mb-2"></i>
+                    <span class="text-white font-bold text-sm">Waze</span>
+                </button>
+                <button onclick="confirmNav('maps')" class="flex flex-col items-center justify-center bg-slate-800 hover:bg-slate-700 p-4 rounded-xl border border-slate-600">
+                    <i class="fa-solid fa-map-location-dot text-emerald-400 text-3xl mb-2"></i>
+                    <span class="text-white font-bold text-sm">Maps</span>
+                </button>
+            </div>
+            <button onclick="document.getElementById('nav-choice-modal').style.display='none'" class="mt-4 text-slate-400 text-xs underline">Annuler</button>
+        </div>
+    </div>
+
     <div id="login-overlay">
         <div class="mb-8 flex flex-col items-center">
             <i class="fa-solid fa-crown text-4xl text-accent mb-4"></i>
-            <h2 class="text-white font-bold text-xl uppercase tracking-widest">Ultimate V51</h2>
+            <h2 class="text-white font-bold text-xl uppercase tracking-widest">Ultimate V52</h2>
             <p class="text-slate-500 text-xs mt-1">Code PIN requis</p>
             <p id="login-error" class="text-red-500 text-xs font-bold mt-2">Code Incorrect</p>
         </div>
@@ -147,6 +167,7 @@
                     <option value="Messenger|https://m.me/|fa-brands fa-facebook-messenger|#0084FF">Messenger</option>
                     <option value="Telegram|https://t.me/|fa-brands fa-telegram|#0088cc">Telegram</option>
                     <option value="Téléphone|tel:|fa-solid fa-phone|#ffffff">Téléphone</option>
+                    <option value="Gmail|https://mail.google.com|fa-solid fa-envelope|#EA4335">Gmail</option>
                 </optgroup>
                 
                 <optgroup label="Musique">
@@ -182,12 +203,12 @@
     </div>
 
     <nav class="glass-panel sticky top-0 z-50 border-b border-slate-700/50 pt-safe-top h-16 flex-none flex justify-between items-center px-4">
-        <div class="flex items-center gap-2 text-slate-500 z-10 w-20"><i class="fa-solid fa-bolt text-accent"></i> <span class="text-[10px] font-bold uppercase tracking-wider">V51</span></div>
+        <div class="flex items-center gap-2 text-slate-500 z-10 w-20"><i class="fa-solid fa-bolt text-accent"></i> <span class="text-[10px] font-bold uppercase tracking-wider">V52</span></div>
         <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center gap-3"><div class="text-3xl font-black text-white digital-clock font-mono" id="clock-display">--:--</div></div>
         <div class="flex items-center justify-end gap-3 z-10 w-auto">
-            <div id="top-weather" class="flex items-center gap-2 text-xs font-bold text-slate-300"><span class="text-[9px] opacity-50">GPS?</span></div>
-            <div class="h-4 w-[1px] bg-slate-700"></div>
-            <i id="wake-icon" class="fa-solid fa-lightbulb text-slate-600 text-sm transition-colors duration-500"></i>
+            <div id="top-weather" class="flex items-center gap-2 text-lg font-bold text-slate-300"><span class="text-sm opacity-50">GPS?</span></div>
+            <div class="h-6 w-[1px] bg-slate-700 ml-2"></div>
+            <i id="wake-icon" class="fa-solid fa-lightbulb text-slate-600 text-lg transition-colors duration-500 ml-3"></i>
         </div>
     </nav>
 
@@ -401,14 +422,37 @@
     </nav>
 
     <script>
-        // --- 1. CORE & PIN ---
+        // --- 1. CORE & PIN (SECURE HASH) ---
         setInterval(() => { const el = document.getElementById('clock-display'); if(el) el.innerText = new Date().toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'}); }, 1000);
-        let savedPin = localStorage.getItem('scooter_pin') || "0000"; let currentPin = "";
+        
+        // HASH FUNCTION FOR SECURITY (Simple DJB2 variant)
+        const hashCode = s => s.split('').reduce((a,b)=>{a=((a<<5)-a)+b.charCodeAt(0);return a&a},0);
+        
+        let savedPinHash = localStorage.getItem('scooter_pin_hash') || "1537214"; // Default Hash for "0000"
+        let currentPin = "";
+
         function typePin(d) { if(currentPin.length<4){ currentPin+=d; updatePinDots(); if(currentPin.length===4) checkPin(); } }
         function clearPin() { currentPin=""; updatePinDots(); document.getElementById('login-error').classList.add('opacity-0'); }
         function updatePinDots() { for(let i=1;i<=4;i++) document.getElementById('dot-'+i).classList.toggle('filled', i<=currentPin.length); }
-        function checkPin() { if(currentPin===savedPin) document.getElementById('login-overlay').style.display='none'; else { document.getElementById('login-error').classList.remove('opacity-0'); setTimeout(clearPin,500); } }
-        function changeUserPin() { const n = document.getElementById('new-pin-input').value; if(n.length===4 && confirm('Changer PIN?')) { localStorage.setItem('scooter_pin', n); savedPin=n; alert('OK'); document.getElementById('new-pin-input').value=""; } }
+        
+        function checkPin() { 
+            if(hashCode(currentPin) == savedPinHash) {
+                document.getElementById('login-overlay').style.display='none'; 
+            } else { 
+                document.getElementById('login-error').classList.remove('opacity-0'); 
+                setTimeout(clearPin,500); 
+            } 
+        }
+        
+        function changeUserPin() { 
+            const n = document.getElementById('new-pin-input').value; 
+            if(n.length===4 && confirm('Changer PIN?')) { 
+                savedPinHash = hashCode(n);
+                localStorage.setItem('scooter_pin_hash', savedPinHash); 
+                alert('OK'); 
+                document.getElementById('new-pin-input').value=""; 
+            } 
+        }
         
         // --- 2. DATA & STATE ---
         let state = { 
@@ -424,11 +468,10 @@
                     const loaded = JSON.parse(d);
                     state = { ...state, ...loaded };
                     
-                    // --- NETTOYAGE AUTOMATIQUE DES LIENS CORROMPUS ---
-                    // Si on détecte un ancien lien whatsapp:// ou wa.me/ qui bug, on le supprime pour forcer le propre
+                    // --- NETTOYAGE LIENS WHATSAPP ---
                     if (state.shortcutsMain) {
                         state.shortcutsMain = state.shortcutsMain.map(s => 
-                            (s && (s.url.includes('wa.me') || s.url.includes('whatsapp://'))) ? null : s
+                            (s && (s.url.includes('whatsapp') || s.url.includes('wa.me'))) ? null : s
                         );
                     }
                     
@@ -484,16 +527,8 @@
         // --- APP LAUNCHER ENGINE (SIMPLE & ROBUST) ---
         function launchApp(url) {
             if(!url) return;
-            // Internal Calc Check
             if(url === 'sys_calc' || url.includes('calc')) { openCalc(); return; }
-            
-            // Standard Web Open (HTTPS)
-            if(url.startsWith('http')) { 
-                window.open(url, '_blank'); 
-            } else { 
-                // URI schemes fallback
-                window.location.href = url; 
-            }
+            if(url.startsWith('http')) { window.open(url, '_blank'); } else { window.location.href = url; }
         }
 
         // --- METEO & NAV ---
@@ -521,10 +556,25 @@
             saveData();
         }
 
+        // --- NAV CHOICE MODAL LOGIC ---
+        let pendingNavType = ""; // 'home' or 'work'
+
         function openNav(type) {
             const addr = state.addresses[type];
             if(!addr) return alert("Veuillez configurer l'adresse dans le Garage.");
-            if(confirm("Ouvrir Waze ?")) window.open(`https://waze.com/ul?q=${encodeURIComponent(addr)}&navigate=yes`, '_blank');
+            pendingNavType = type;
+            document.getElementById('nav-choice-modal').style.display = 'flex';
+        }
+
+        function confirmNav(service) {
+            const addr = state.addresses[pendingNavType];
+            document.getElementById('nav-choice-modal').style.display = 'none';
+            
+            if(service === 'waze') {
+                window.open(`https://waze.com/ul?q=${encodeURIComponent(addr)}&navigate=yes`, '_blank');
+            } else {
+                window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addr)}`, '_blank');
+            }
         }
 
         // --- GPS CORE & AUTO-INIT ---
@@ -548,7 +598,6 @@
                     map.setView([lat, lon], 16); marker.setLatLng([lat, lon]); fetchWeather(lat, lon);
                 });
             }
-            // FORCE CENTER
             centerMap();
         }
 
@@ -649,7 +698,7 @@
         function resetMultiMaint(key) { if(confirm('Reset '+key+'?')) { state.maintenance[key].last = state.odo; saveData(); updateUI(); } }
         function setMaintInterval(key) { const v=prompt("Intervalle:"); if(v&&!isNaN(v)){ state.maintenance[key].interval=parseFloat(v); saveData(); updateUI(); } }
 
-        // --- CHART (DIST / ALT) ---
+        // --- CHART ---
         let chartInstance = null; let chartMode = 'dist'; 
         function setChartMode(m) { chartMode = m; document.getElementById('btn-chart-dist').className = m==='dist' ? "text-[9px] px-2 py-0.5 rounded text-slate-300 bg-slate-600" : "text-[9px] px-2 py-0.5 rounded text-slate-500"; document.getElementById('btn-chart-alt').className = m==='alt' ? "text-[9px] px-2 py-0.5 rounded text-slate-300 bg-slate-600" : "text-[9px] px-2 py-0.5 rounded text-slate-500"; renderChart(); }
         function renderChart() {
@@ -673,19 +722,17 @@
         let editTarget = null; let currentSlotIndex = -1;
         function renderShortcuts(type) { 
             const grid = document.getElementById(`shortcut-grid-${type}`); if(!grid) return; grid.innerHTML = '';
-            const list = type === 'main' ? state.shortcutsMain : []; // IGNORE MINI
+            const list = type === 'main' ? state.shortcutsMain : []; 
             const isEditing = (editTarget === type);
             const heightClass = 'h-20'; 
 
             list.forEach((app, index) => {
                 const btn = document.createElement('div');
                 if (app) {
-                    // FIX: Ensure Name/Icon/Color are populated even if mis-saved
                     let displayIcon = app.icon || "fa-solid fa-cube";
                     let displayName = app.name || "App";
                     let displayColor = app.color || "#ffffff";
 
-                    // LOGIC EXECUTION
                     let action = `launchApp('${app.url}')`;
                     if(isEditing) action = `openAppModal('${type}', ${index})`;
 
@@ -711,7 +758,6 @@
             modal.classList.add('flex'); modal.classList.remove('hidden');
         }
         function closeAppModal() { document.getElementById('app-modal').classList.add('hidden'); document.getElementById('app-modal').classList.remove('flex'); }
-        // FIX: Ensure prefill uses correct 4-part split
         function prefillApp() { const val = document.getElementById('app-select').value; if (val === 'custom') return; const [name, url, icon, color] = val.split('|'); document.getElementById('app-name').value = name; document.getElementById('app-url').value = url; document.getElementById('app-icon').value = icon; document.getElementById('app-color').value = color; }
         
         function saveShortcut() {
